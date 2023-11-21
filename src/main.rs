@@ -1,6 +1,13 @@
+use chrono::format::format;
+use initdb::DbInfo;
 use mysql::*;
 use mysql::prelude::*;
+use rocket::response::content::RawHtml;
 
+use crate::user::User;
+
+mod initdb;
+mod user;
 struct Payment {
     uid: u32,
     amount: i32,
@@ -19,14 +26,37 @@ struct Flight {
     arrive_time: String,
 }
 
-struct User {
-    uid: u32,
-    nickname: Option<String>,
-    admin: bool,
-}
+
+
+
+
+// #[macro_use] extern crate rocket;
+
+// #[get("/")]
+// fn index() -> &'static str {
+//     "Hello, world!"
+// }
+
+// #[get("/buy")]
+// fn buy() -> RawHtml<&'static str> {
+//     RawHtml(r#"See <a href="tera">Tera</a> or <a href="hbs">Handlebars</a>.
+//                 <img src="https://chxc.cc/img/chxw.png">
+//                 "#)
+// }
+
+// #[launch]
+// fn rocket() -> _ {
+//     rocket::build().mount("/", routes![index, buy])
+// }
 
 fn main() {
-    let url = "mysql://root:chxMIMA@@localhost:3306/test";
-    let pool = Pool::new(url).unwrap(); // 获取连接池
-    let mut conn = pool.get_conn().unwrap();// 获取链接
+    let db = DbInfo {
+        ip: "localhost".to_owned(),
+        port: "3306".to_owned(),
+        user: "root".to_owned(),
+        password: "chxMIMA@".to_owned(),
+        db_name: "db_flight".to_owned(),
+    };
+    db.init_db();
+    let mut conn = db.conn();
 }
