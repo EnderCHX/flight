@@ -6,4 +6,7 @@
         <p>到达城市  <input type="text" id="arrive"></p>
         <p><input type="button" value="查询" id="search" onclick="search_flight()"></p>
     </div>
+    <div>
+        <a href="/login">登录</a>/<a href="/register">注册</a>
+    </div>
 {% endblock content %}

@@ -8,11 +8,11 @@ edition = "2021"
 [dependencies]
 mysql = "*"
 chrono = "*"
-serde = "*"
 rocket = { version = "*", features = ["secrets"] }
 lazy_static = "*"
 rand = "*"
 rust-crypto = "*"
+json = "*"
 
 [dependencies.rocket_dyn_templates]
 rocket_dyn_templates = "*"

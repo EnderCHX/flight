@@ -1,22 +1,25 @@
 #[macro_use] extern crate rocket;
-use std::ptr::null;
+use json::{object, JsonValue};
 use lazy_static::*;
-use mysql::prelude::Queryable;
-use mysql::{PooledConn, Pool, params};
+use mysql::prelude::*;
+use mysql::*;
+use rocket::data;
 use rocket::http::CookieJar;
-use rocket::http::hyper::server::conn;
 use rocket::response::content::RawHtml;
 use rocket::fs::{FileServer, relative};
+use rocket::response::status;
 use rocket_dyn_templates::*;
 use rand::Rng;
 use initdb::DbInfo;
 use chrono::*;
 use user::User;
 
+
 mod initdb;
 mod user;
 mod flight;
 mod payment;
+
 
 lazy_static! {
     static ref DB: DbInfo = DbInfo {
@@ -35,10 +38,9 @@ lazy_static! {
 }
 
 
-
 #[get("/")]
-fn index(cookies: &CookieJar<'_>) -> Template {
-    if cookies.get("username").is_none() {
+async fn index(cookies: &CookieJar<'_>) -> Template {
+    if cookies.get_private("username").is_none() {
         let timestamp: i64 = Utc::now().timestamp();
         let mut rng = rand::thread_rng();
         let randid = timestamp.to_string() + &rng.gen_range(0..10).to_string();
@@ -50,14 +52,14 @@ fn index(cookies: &CookieJar<'_>) -> Template {
 }
 
 #[get("/buy")]
-fn buy() -> RawHtml<&'static str> {
+async fn buy() -> RawHtml<&'static str> {
     RawHtml(r#"See <a href="tera">Tera</a> or <a href="hbs">Handlebars</a>.
                 <img src="https://chxc.cc/img/chxw.png">
                 "#)
 }
 
 #[get("/search?<leave>&<arrive>")]
-fn search(leave: &str, arrive: &str) -> Template {
+async fn search(leave: &str, arrive: &str) -> Template {
     println!("{} {}", leave, arrive);
     let mut conn = POOL.get_conn().unwrap();
     let res: Vec<(u32, String, String, String, String, u32, u32, u32, u32, u32)> = conn.query("
@@ -76,40 +78,79 @@ fn search(leave: &str, arrive: &str) -> Template {
 }
 
 #[get("/register")]
-fn register() -> Template {
+async fn register() -> Template {
     Template::render("register", context!{
         name: 123,
     })
 }
 
-#[get("/register?<username>&<password>")]
-fn register_do(username: String, password: String,cookies: &CookieJar<'_>) -> &'static str {
+#[post("/register", format = "json", data = "<data>")]
+async fn register_do(cookies: &CookieJar<'_>, data: String) -> &'static str {
+    use json;
+    let data = json::parse(&data).unwrap();
     let mut user = User {
-        uid: 0,
-        username: username,
-        password: password,
+        uid: -1,
+        username: data["username"].to_string(),
+        password: data["password"].to_string(),
         admin: false,
     };
     let mut conn= POOL.get_conn().unwrap();
+
     let status = user.user_register(&mut conn);
-    cookies.remove("username");
-    cookies.add_private(("username", user.username));
-    if status == true {
-        return "注册成功";
+
+
+    if status == 1 {
+        cookies.remove("username");
+        cookies.add_private(("username", data["username"].to_string()));
+        return "{\"message\": 1}"; //注册成功
+    } else if status == 2 {
+        return "{\"message\": 2}"; // 用户存在
     } else {
-        return "注册失败";
+        return "{\"message\": 0}"; // 未知错误
     }
 }
 
 #[get("/login")]
-fn login() {
-    
+async fn login() -> Template {
+    Template::render("login", context!{
+        name: 123
+    })
+}
+
+#[post("/login", format = "json" ,data = "<data>")]
+async fn login_do(cookies: &CookieJar<'_>, data: String) -> &'static str {
+    use json;
+    let data = json::parse(&data).unwrap();
+
+    let mut conn = POOL.get_conn().unwrap();
+
+    let mut user = User {
+        uid: -1,
+        username: data["username"].to_string(),
+        password: data["password"].to_string(),
+        admin: false,
+    };
+
+    let status_code = user.user_login(&mut conn);
+
+    println!("{:?}", data);
+    if status_code == 1 {
+        cookies.remove("username");
+        cookies.add_private(("username", data["username"].to_string()));
+        return "{\"message\": 1}"; // 成功
+    } else if status_code == 2 {
+        return "{\"message\": 2}"; // 密码错误
+    } else if status_code == -1 {
+        return "{\"message\": -1}"; // 用户不存在
+    } else {
+        return "{\"message\": 0}"; // 未知错误
+    }
 }
 
 #[launch]
 fn rocket() -> _ {
     rocket::build()
-        .mount("/", routes![index, buy, search, register, register_do])
+        .mount("/", routes![index, buy, search, register, register_do, login, login_do])
         .mount("/", FileServer::from(relative!("static")))
         .attach(Template::fairing())
 }
