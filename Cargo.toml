@@ -9,4 +9,11 @@ edition = "2021"
 mysql = "*"
 chrono = "*"
 serde = "*"
-rocket = "*"
+rocket = { version = "*", features = ["secrets"] }
+lazy_static = "*"
+rand = "*"
+rust-crypto = "*"
+
+[dependencies.rocket_dyn_templates]
+rocket_dyn_templates = "*"
+features = ["tera"]

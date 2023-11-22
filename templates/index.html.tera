@@ -1,0 +1,9 @@
+{% block content %}
+    <script src="/js/my.js"></script>
+    <h1>机票售票系统</h1>
+    <div>
+        <p>出发城市  <input type="text" id="leave"></p>
+        <p>到达城市  <input type="text" id="arrive"></p>
+        <p><input type="button" value="查询" id="search" onclick="search_flight()"></p>
+    </div>
+{% endblock content %}

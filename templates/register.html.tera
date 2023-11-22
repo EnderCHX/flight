@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<head>
+    <title>注册</title>
+    <script src="/js/my.js"></script>
+    <script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script>
+</head>
+<body>
+    <div>
+        <p>输入用户名<input type="text" id="username"></p>
+        <p>输入密码  <input type="password" id="password"></p>
+        <p>重复密码  <input type="password" id="password2"></p>
+        <p><input type="button" value="注册" onclick="register()"></p>
+        <p id="info"></p>
+    </div>
+</body>
