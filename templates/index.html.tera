@@ -1,6 +1,10 @@
 {% block content %}
     <script src="/js/my.js"></script>
     <h1>机票售票系统</h1>
+    <h2>你好：{{ name }}</h2>
+    {% if if_guest == "0" %}
+    <input type="button" onclick="logout()" value="注销">
+    {% endif %}
     <div>
         <p>出发城市  <input type="text" id="leave"></p>
         <p>到达城市  <input type="text" id="arrive"></p>

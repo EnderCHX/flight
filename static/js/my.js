@@ -117,3 +117,12 @@ function login() {
         })
     }
 }
+
+function logout() {
+    fetch(`http://${window.location.host}/logout`)
+    .then((response => { 
+        console.log(response);
+        console.log("logout"); 
+        home();
+    }))
+}

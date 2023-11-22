@@ -7,7 +7,7 @@ use rocket::data;
 use rocket::http::CookieJar;
 use rocket::response::content::RawHtml;
 use rocket::fs::{FileServer, relative};
-use rocket::response::status;
+use rocket::response::{status, Redirect};
 use rocket_dyn_templates::*;
 use rand::Rng;
 use initdb::DbInfo;
@@ -40,14 +40,38 @@ lazy_static! {
 
 #[get("/")]
 async fn index(cookies: &CookieJar<'_>) -> Template {
+
     if cookies.get_private("username").is_none() {
+
         let timestamp: i64 = Utc::now().timestamp();
         let mut rng = rand::thread_rng();
         let randid = timestamp.to_string() + &rng.gen_range(0..10).to_string();
+
         cookies.add_private(("username", format!("guest{}", randid)));
+        cookies.add_private(("if_guest", "1"));
+
+    } else {
+        return Template::render("index", context! {
+            name: {
+                let username = cookies.get_private("username").unwrap().to_string();
+                if username.len() > 8 {
+                    username[9..].to_string()
+                } else {
+                    "null".to_string()
+                }
+            },
+            if_guest: {
+                let if_guest = cookies.get_private("if_guest").unwrap().to_string();
+                if if_guest.len() > 8 {
+                    if_guest[9..].to_string()
+                } else {
+                    "null".to_string()
+                }
+            },
+        });
     }
-    Template::render("index", context! {
-        name: 123,
+    Template::render("error", context! {
+        error: "已退出登录，请刷新"
     })
 }
 
@@ -100,8 +124,9 @@ async fn register_do(cookies: &CookieJar<'_>, data: String) -> &'static str {
 
 
     if status == 1 {
-        cookies.remove("username");
+        cookies.remove_private("username");
         cookies.add_private(("username", data["username"].to_string()));
+        cookies.add_private(("if_guest", "0"));
         return "{\"message\": 1}"; //注册成功
     } else if status == 2 {
         return "{\"message\": 2}"; // 用户存在
@@ -135,8 +160,9 @@ async fn login_do(cookies: &CookieJar<'_>, data: String) -> &'static str {
 
     println!("{:?}", data);
     if status_code == 1 {
-        cookies.remove("username");
+        cookies.remove_private("username");
         cookies.add_private(("username", data["username"].to_string()));
+        cookies.add_private(("if_guest", "0"));
         return "{\"message\": 1}"; // 成功
     } else if status_code == 2 {
         return "{\"message\": 2}"; // 密码错误
@@ -147,10 +173,17 @@ async fn login_do(cookies: &CookieJar<'_>, data: String) -> &'static str {
     }
 }
 
+#[get("/logout")]
+async fn logout(cookies: &CookieJar<'_>) -> Redirect {
+    cookies.remove_private("username");
+    cookies.remove_private("if_guest");
+    Redirect::to(uri!(index))
+}
+
 #[launch]
 fn rocket() -> _ {
     rocket::build()
-        .mount("/", routes![index, buy, search, register, register_do, login, login_do])
+        .mount("/", routes![index, buy, search, register, register_do, login, login_do, logout])
         .mount("/", FileServer::from(relative!("static")))
         .attach(Template::fairing())
 }
