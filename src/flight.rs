@@ -8,8 +8,8 @@ pub struct Flight {
     arrive_city: Option<String>,
     leave_airport: Option<String>,
     arrive_airport: Option<String>,
-    leave_time: String,
-    arrive_time: String,
+    leave_time: u32,
+    arrive_time: u32,
 }
 
 impl Flight {

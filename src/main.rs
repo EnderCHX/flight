@@ -180,10 +180,102 @@ async fn logout(cookies: &CookieJar<'_>) -> Redirect {
     Redirect::to(uri!(index))
 }
 
+#[get("/admin")]
+async fn admin(cookies: &CookieJar<'_>) -> Template {
+
+    let get_name = cookies.get_private("username").unwrap().to_string();
+
+    let mut user = User {
+        uid: -1,
+        username: get_name[9..].to_string(),
+        password: String::new(),
+        admin: false
+    };
+
+    println!("{}", user.username);
+
+    let mut conn = POOL.get_conn().unwrap();
+    conn.query_map(format!("
+        SELECT uid, admin FROM users WHERE username = '{}'", 
+        user.username),
+        | (uid, admin)| {
+            user.uid = uid;
+            user.admin = admin;
+        }).unwrap();
+    
+    if user.admin {
+
+        let flights_list: Vec<(u32, String, String, String, String, u32, u32, u32, u32, u32)> = conn.query("
+            SELECT * FROM flights").unwrap();
+
+        return Template::render("admin", context!{
+            name: 123,
+            flights: flights_list,
+        })
+    } else {
+        return Template::render("error", context!{
+            error: "你不是管理员",
+        });
+    }
+}
+
+#[post("/admin/cflight", format = "json", data = "<data>")]
+fn change_flight(cookies: &CookieJar<'_>, data: &str) -> &'static str {
+    use json;
+
+    let data = json::parse(data).unwrap(); 
+    /*{
+        "type": 0, // 0添加 1修改 2删除
+        "info": {
+            "num": 1,
+            "leave_city": "哈尔滨",
+            "arrive_city": "石家庄",
+            "leave_airport": "太平国际机场",
+            "arrive_airport": "正定机场",
+            "leave_time": 时间戳,
+            "arrive_time": 时间戳,
+            "price": 100,
+            "capacity": 100,
+            "booked": 10
+        }
+    } */
+    let mut conn = POOL.get_conn().unwrap();
+
+    conn.query_map(format!("
+        SELECT admin FROM users WHERE username = '{}'", 
+        cookies.get_private("username").unwrap()),
+        | admin | {
+            if admin {
+                if data["type"] == 0 {
+
+                } else if data["type"] == 1 {
+
+                } else if data["type"] ==2 {
+
+                } else {
+
+                }
+                return r#"{message: "1"}"#;
+            } else {
+                return r#"{message: "0"}"#; //不是管理员不能修改
+            }
+        }).unwrap();
+    return r#"{message: "-1"}"#; // 未知错误
+}
+
 #[launch]
 fn rocket() -> _ {
     rocket::build()
-        .mount("/", routes![index, buy, search, register, register_do, login, login_do, logout])
+        .mount("/", routes![index, 
+                                  buy, 
+                                  search, 
+                                  register, 
+                                  register_do, 
+                                  login, 
+                                  login_do, 
+                                  logout, 
+                                  admin,
+                                  change_flight])
         .mount("/", FileServer::from(relative!("static")))
         .attach(Template::fairing())
 }

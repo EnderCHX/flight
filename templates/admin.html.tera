@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<head>
+    <title>管理</title>
+    <script src="/js/my.js"></script>
+    <script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script>
+</head>
+<body>
+    <div>
+        {% for flight in flights %}
+        <div>
+            <p>
+                <input type="text" value="{{flight.0}}" id="num_{{flight.0}}">
+                <input type="text" value="{{flight.1}}" id="leave_city_{{flight.0}}">
+                <input type="text" value="{{flight.2}}" id="arrive_city_{{flight.0}}">
+                <input type="text" value="{{flight.3}}" id="leave_airport_{{flight.0}}">
+                <input type="text" value="{{flight.4}}" id="arrive_airport_{{flight.0}}">
+                <input type="text" value="{{flight.5}}" id="leave_time_{{flight.0}}">
+                <input type="text" value="{{flight.6}}" id="arrive_time_{{flight.0}}">
+                <input type="text" value="{{flight.7}}" id="price_{{flight.0}}">
+                <input type="text" value="{{flight.8}}" id="capacity_{{flight.0}}">
+                <input type="text" value="{{flight.9}}" id="booked_{{flight.0}}">
+            </p>
+            <p>
+                <input type="button" value="修改" onclick="change_flight({{flight.0}})">
+            </p>
+        </div>
+        {% endfor %}
+    </div>
+</body>

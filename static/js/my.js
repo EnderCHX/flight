@@ -7,6 +7,11 @@ function ifnull(id) {
     }
 }
 
+// 简写id获取控件
+getE = (id) =>{
+    return document.getElementById(id);
+}
+
 //查询航班
 function search_flight() {
     let arrive = ifnull("arrive");
@@ -125,4 +130,40 @@ function logout() {
         console.log("logout"); 
         home();
     }))
+}
+
+function change_flight(e) {
+    let info = {
+        "num": getE(`num_${e}`).value,
+        "leave_city": getE(`leave_city_${e}`).value,
+        "arrive_city": getE(`arrive_city_${e}`).value,
+        "leave_airport": getE(`leave_airport_${e}`).value,
+        "arrive_airport": getE(`arrive_airport_${e}`).value,
+        "leave_time": getE(`leave_time_${e}`).value,
+        "arrive_time": getE(`arrive_time_${e}`).value,
+        "price": getE(`price_${e}`).value,
+        "capacity": getE(`capacity_${e}`).value,
+        "booked": getE(`booked_${e}`).value,
+    };
+    console.log(info)
+    
+    let data = {
+        "type": 0,
+        "info": info
+    }
+    console.log(data)
+
+    fetch(`http://${window.location.host}/admin/cflight`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+    }).then((response) => response.json())
+    .then((data) => {
+        console.log(data);
+    })
+    .catch((error) => {
+        console.error("Error:", error);
+    });
 }

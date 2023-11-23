@@ -6,14 +6,11 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-mysql = "*"
-chrono = "*"
-rocket = { version = "*", features = ["secrets"] }
-lazy_static = "*"
-rand = "*"
-rust-crypto = "*"
-json = "*"
-
-[dependencies.rocket_dyn_templates]
-rocket_dyn_templates = "*"
-features = ["tera"]
+mysql = "24.0.0"
+chrono = "0.4.31"
+rocket = { version = "0.5.0", features = ["secrets"] }
+lazy_static = "1.4.0"
+rand = "0.8.5"
+rust-crypto = "0.2.36"
+json = "0.12.4"
+rocket_dyn_templates = { version = "0.1.0", features = ["tera"] }
