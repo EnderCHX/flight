@@ -1,3 +1,11 @@
+<!DOCTYPE html>
+<head>
+    <title>机票售票系统</title>
+    <script src="/js/my.js"></script>
+    <script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+</head>
+<body>
 {% block content %}
     <script src="/js/my.js"></script>
     <h1>机票售票系统</h1>
@@ -8,9 +16,12 @@
     <div>
         <p>出发城市  <input type="text" id="leave"></p>
         <p>到达城市  <input type="text" id="arrive"></p>
-        <p><input type="button" value="查询" id="search" onclick="search_flight()"></p>
+        <p><input type="button" value="查询" id="search" onclick="search_flight()">
+            <input type="button" value="所有航班" id="search" onclick="search_flight('all')">
+        </p>
     </div>
     <div>
         <a href="/login">登录</a>/<a href="/register">注册</a>
     </div>
 {% endblock content %}
+</body>

@@ -31,32 +31,43 @@ impl DbInfo {
         conn.query_drop(
             r"
             CREATE TABLE IF NOT EXISTS users (
-                uid INT UNSIGNED auto_increment NOT NULL,
+                uid INT auto_increment NOT NULL,
                 username VARCHAR(20) UNIQUE NOT NULL,
                 password VARCHAR(128) NOT NULL,
                 admin int NOT NULL,
                 PRIMARY KEY (uid)
             );
-            INSERT IGNORE INTO users VALUES (1, 'admin', 'admin', 1)
+            INSERT IGNORE INTO users VALUES (1, 'admin', '21232f297a57a5a743894a0e4a801fc3', 1)
             ",
         ).expect("Failed to create users table");
         conn.query_drop(
             r"
             CREATE TABLE IF NOT EXISTS flights (
-                num INT UNSIGNED auto_increment NOT NULL,
+                num INT auto_increment NOT NULL,
                 leave_city VARCHAR(128) NOT NULL,
                 arrive_city VARCHAR(128) NOT NULL,
                 leave_airport VARCHAR(128) NOT NULL,
                 arrive_airport VARCHAR(128) NOT NULL,
                 leave_time INT NOT NULL,
                 arrive_time INT NOT NULL,
-                price INT UNSIGNED NOT NULL,
-                capacity INT UNSIGNED NOT NULL,
-                booked INT UNSIGNED NOT NULL,
+                price DOUBLE NOT NULL,
+                capacity INT NOT NULL,
+                booked INT NOT NULL,
                 PRIMARY KEY (num)
             )
             ",
         ).expect("Failed to create flights table");
+
+        conn.query_drop(
+            r"
+            CREATE TABLE IF NOT EXISTS payments (
+                num INT NOT NULL,
+                uid INT NOT NULL,
+                amount INT NOT NULL,
+                time INT NOT NULL
+            )
+            ",
+        ).expect("Failed to create payments table");
         drop(conn)
     }
 }

@@ -13,17 +13,19 @@ getE = (id) =>{
 }
 
 //查询航班
-function search_flight() {
-    let arrive = ifnull("arrive");
-    let leave = ifnull("leave");
-    let domain = window.location.host;
-    window.location.href = `http://${domain}/search?leave=${leave}&arrive=${arrive}`;
+function search_flight(all) {
+    if (all == "all") {
+        window.location.href = `/search?leave=all&arrive=all`;
+    } else {
+        let arrive = ifnull("arrive");
+        let leave = ifnull("leave");
+        window.location.href = `/search?leave=${leave}&arrive=${arrive}`;
+    }
 }
 
 //返回首页
 function home() {
-    let home = window.location.host;
-    window.location.href = `http://${home}`;
+    window.location.href = `/`;
 }
 
 function sleep (time) {
@@ -47,7 +49,7 @@ function register() {
                 password: hash
             };
 
-            fetch(`http://${window.location.host}/register`, {
+            fetch(`/register`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -93,7 +95,7 @@ function login() {
                 password: hash
             };
 
-            fetch(`http://${window.location.host}/login`, {
+            fetch(`/login`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -124,7 +126,7 @@ function login() {
 }
 
 function logout() {
-    fetch(`http://${window.location.host}/logout`)
+    fetch(`/logout`)
     .then((response => { 
         console.log(response);
         console.log("logout"); 
@@ -132,28 +134,28 @@ function logout() {
     }))
 }
 
-function change_flight(e) {
+function change_flight(e, type) {
     let info = {
-        "num": getE(`num_${e}`).value,
-        "leave_city": getE(`leave_city_${e}`).value,
-        "arrive_city": getE(`arrive_city_${e}`).value,
-        "leave_airport": getE(`leave_airport_${e}`).value,
-        "arrive_airport": getE(`arrive_airport_${e}`).value,
-        "leave_time": getE(`leave_time_${e}`).value,
-        "arrive_time": getE(`arrive_time_${e}`).value,
-        "price": getE(`price_${e}`).value,
-        "capacity": getE(`capacity_${e}`).value,
-        "booked": getE(`booked_${e}`).value,
+        "num":              getE(`num_${e}`).value,
+        "leave_city":       getE(`leave_city_${e}`).value,
+        "arrive_city":      getE(`arrive_city_${e}`).value,
+        "leave_airport":    getE(`leave_airport_${e}`).value,
+        "arrive_airport":   getE(`arrive_airport_${e}`).value,
+        "leave_time":       getE(`leave_time_${e}`).value,
+        "arrive_time":      getE(`arrive_time_${e}`).value,
+        "price":            getE(`price_${e}`).value,
+        "capacity":         getE(`capacity_${e}`).value,
+        "booked":           getE(`booked_${e}`).value,
     };
     console.log(info)
     
     let data = {
-        "type": 0,
+        "type": type,
         "info": info
     }
     console.log(data)
 
-    fetch(`http://${window.location.host}/admin/cflight`, {
+    fetch(`/admin/cflight`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -162,8 +164,63 @@ function change_flight(e) {
     }).then((response) => response.json())
     .then((data) => {
         console.log(data);
+        if (data["message"] == 1) {
+            alert("增加成功");
+            location.reload();
+        } else if (data["message"] == 2 ) {
+            alert("修改成功");
+            location.reload();
+        } else if (data["message"] ==3 ) {
+            alert("删除成功");
+            location.reload();
+        } else {
+            alert("未知错误");
+            location.reload();
+        }
     })
     .catch((error) => {
         console.error("Error:", error);
+        alert("未知错误");
+        location.reload();
     });
+}
+
+function change_user(e) {
+    let data = {
+        "uid": getE(`uid_${e}`).value,
+        "username": getE(`username_${e}`).value,
+        "password": md5(getE(`password_${e}`).value),
+        "admin": getE(`admin_${e}`).checked
+    };
+    console.log(data)
+
+    fetch("/admin/cuser", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+    }).then((response) => response.json())
+    .then((data) => {
+        console.log(data);
+        if (data["message"] == 1) {
+            alert("用户修改成功");
+            location.reload();
+        }else if (data["message"] == 2) {
+            alert("修改成功但未做更改");
+            location.reload()
+        }else {
+            alert("未知错误");
+            location.reload();
+        }
+    })
+    .catch((error) => {
+        console.error("Error:", error);
+        alert("未知错误");
+        location.reload();
+    });
+} 
+
+function buy(e) {
+    window.location.href = `/buy?num=${e}`;
 }

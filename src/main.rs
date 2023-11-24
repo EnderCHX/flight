@@ -75,29 +75,49 @@ async fn index(cookies: &CookieJar<'_>) -> Template {
     })
 }
 
-#[get("/buy")]
-async fn buy() -> RawHtml<&'static str> {
-    RawHtml(r#"See <a href="tera">Tera</a> or <a href="hbs">Handlebars</a>.
-                <img src="https://chxc.cc/img/chxw.png">
-                "#)
+#[get("/buy?<num>")]
+async fn buy(cookies: &CookieJar<'_>, num: i32) -> Template {
+
+    let username = cookies.get_private("username").unwrap().to_string();
+    let username = username[9..].to_string();
+
+    let mut conn = POOL.get_conn().unwrap();
+    let uid: Vec<i32> = conn.query(format!(r#"SELECT uid FROM users WHERE username = "{}""#, username)).unwrap();
+    let uid = {if uid.len() == 1 {uid[0]} else {0}};
+
+    let time = Utc::now().timestamp();
+
+    Template::render("buy", context!{
+        uid: uid,
+        num: num,
+        time: time,
+    })
 }
 
 #[get("/search?<leave>&<arrive>")]
 async fn search(leave: &str, arrive: &str) -> Template {
-    println!("{} {}", leave, arrive);
+
     let mut conn = POOL.get_conn().unwrap();
-    let res: Vec<(u32, String, String, String, String, u32, u32, u32, u32, u32)> = conn.query("
+
+    let res: Vec<(i32, String, String, String, String, i64, i64, f64, i32, i32)> = conn.query("
         SELECT num, leave_city, arrive_city, leave_airport, arrive_airport, leave_time, arrive_time, price, capacity, booked
         FROM flights").unwrap();
-    let mut result: Vec<(u32, String, String, String, String, u32, u32, u32, u32, u32)> = vec![];
-    for i in res {
-        if i.1 == leave && i.2 == arrive {
-            result.push((i.0, i.1, i.2, i.3, i.4, i.5, i.6, i.7, i.8, i.9));
+
+    let mut result: Vec<(i32, String, String, String, String, i64, i64, f64, i32, i32)> = vec![];
+
+    for i in &res {
+        if i.to_owned().1 == leave && i.to_owned().2 == arrive {
+            result.push((i.0, i.to_owned().1, i.to_owned().2, i.to_owned().3, i.to_owned().4, i.5, i.6, i.7, i.8, i.9));
         }
     }
+
     Template::render("search", context!{
+        leave: leave,
+        arrive: arrive,
         result: &result,
         ifres: result.len(),
+        all: res,
+        if_all: {if leave == "all" && arrive == "all" {true} else {false}},
     })
 }
 
@@ -192,8 +212,6 @@ async fn admin(cookies: &CookieJar<'_>) -> Template {
         admin: false
     };
 
-    println!("{}", user.username);
-
     let mut conn = POOL.get_conn().unwrap();
     conn.query_map(format!("
         SELECT uid, admin FROM users WHERE username = '{}'", 
@@ -205,12 +223,21 @@ async fn admin(cookies: &CookieJar<'_>) -> Template {
     
     if user.admin {
 
-        let flights_list: Vec<(u32, String, String, String, String, u32, u32, u32, u32, u32)> = conn.query("
+        let flights_list: Vec<(i32, String, String, String, String, i64, i64, f64, i32, i32)> = conn.query("
             SELECT * FROM flights").unwrap();
 
+        let mut users_list: Vec<(i32, String, String, bool)> = conn.query(r#"SELECT * FROM users"#).unwrap();
+
+        for i in 0..users_list.len() {
+
+            users_list[i].2 = "Do not see".to_string();
+
+        }
+        
         return Template::render("admin", context!{
             name: 123,
             flights: flights_list,
+            users: users_list,
         })
     } else {
         return Template::render("error", context!{
@@ -223,7 +250,7 @@ async fn admin(cookies: &CookieJar<'_>) -> Template {
 fn change_flight(cookies: &CookieJar<'_>, data: &str) -> &'static str {
     use json;
 
-    let data = json::parse(data).unwrap(); 
+    
     /*{
         "type": 0, // 0添加 1修改 2删除
         "info": {
@@ -239,28 +266,129 @@ fn change_flight(cookies: &CookieJar<'_>, data: &str) -> &'static str {
             "booked": 10
         }
     } */
+
     let mut conn = POOL.get_conn().unwrap();
 
-    conn.query_map(format!("
-        SELECT admin FROM users WHERE username = '{}'", 
-        cookies.get_private("username").unwrap()),
-        | admin | {
-            if admin {
-                if data["type"] == 0 {
+    let username = cookies.get_private("username").unwrap().to_string();
+    let username = username[9..].to_string();
 
-                } else if data["type"] == 1 {
+    let if_admin: Vec<bool> = conn.query(format!("
+        SELECT admin FROM users WHERE username = '{}'", username
+        )).unwrap();
+    
+    if if_admin.len() == 1 {
+        if if_admin[0] {
+            let data = json::parse(data).unwrap(); 
 
-                } else if data["type"] ==2 {
+            if data["type"] == 0 {
 
-                } else {
+                conn.query_drop(format!(r#"
+                INSERT INTO flights values({}, "{}", "{}", "{}", "{}", 
+                {}, {}, {}, {}, {})"#,
+                data["info"]["num"],        data["info"]["leave_city"],  data["info"]["arrive_city"], data["info"]["leave_airport"], data["info"]["arrive_airport"], 
+                data["info"]["leave_time"], data["info"]["arrive_time"], data["info"]["price"],       data["info"]["capacity"],      data["info"]["booked"]
+                )).unwrap();
 
-                }
-                return r#"{message: "1"}"#;
+                return r#"{"message": "1"}"#; // 新增成功
+
+            } else if data["type"] == 1 {
+
+                conn.query_drop(format!(r#"
+                UPDATE flights SET leave_city = "{}", arrive_city = "{}", leave_airport = "{}", arrive_airport = "{}", 
+                leave_time = {}, arrive_time = {}, price = {}, capacity = {}, booked = {}
+                WHERE num = {}"#,
+                data["info"]["leave_city"],  data["info"]["arrive_city"], data["info"]["leave_airport"], data["info"]["arrive_airport"], 
+                data["info"]["leave_time"], data["info"]["arrive_time"], data["info"]["price"], data["info"]["capacity"], data["info"]["booked"], data["info"]["num"]
+                )).unwrap();
+
+                return r#"{"message": "2"}"#; // 修改成功
+
+            } else if data["type"] == 2 {
+
+                conn.query_drop(format!(r#"
+                DELETE FROM flights 
+                WHERE num = {}"#, data["info"]["num"]
+                )).unwrap();
+
+                return r#"{"message": "3"}"#; //删除成功
+
             } else {
-                return r#"{message: "0"}"#; //不是管理员不能修改
+
+                return r#"{"message": "-1"}"#; // 未知操作类型
+
             }
-        }).unwrap();
-    return r#"{message: "-1"}"#; // 未知错误
+        } else {
+
+            return r#"{"message": "0"}"#; //不是管理员不能修改
+
+        }
+    }
+
+    return r#"{"message": "-1"}"#; // 未知错误
+}
+
+#[post("/admin/cuser", format = "json", data = "<data>")]
+async fn change_user(cookies: &CookieJar<'_>, data: &str) -> &'static str {
+    use json;
+
+    let mut conn = POOL.get_conn().unwrap();
+
+    let username = cookies.get_private("username").unwrap().to_string();
+    let username = username[9..].to_string();
+
+    let if_admin: Vec<bool> = conn.query(format!("
+        SELECT admin FROM users WHERE username = '{}'", username
+    )).unwrap();
+    
+    if if_admin.len() == 1 {
+
+        if if_admin[0] {
+            
+            let data = json::parse(data).unwrap();
+
+            println!("{:?}", data);
+
+            let cuser = User {
+                uid: data["uid"].to_string().parse::<i32>().unwrap(),
+                username: data["username"].to_string(),
+                password: data["password"].to_string(),
+                admin: data["admin"].to_string().parse::<bool>().unwrap(),
+            };
+
+            if cuser.password == "11f08230c4ebb3a9b839e4e5a3cbbb10" {
+
+                conn.query_drop(format!(r#"
+                UPDATE IGNORE users SET username = "{}", admin = "{}" WHERE uid = {}"#,
+                cuser.username.as_str(), {if cuser.admin {1} else {0}}, cuser.uid,
+                )).unwrap();
+
+            } else {
+
+                conn.query_drop(format!(r#"
+                UPDATE IGNORE users SET username = "{}", password = "{}", admin = "{}" WHERE uid = {}"#,
+                cuser.username.as_str(), cuser.password.as_str(), {if cuser.admin {1} else {0}}, cuser.uid,
+                )).unwrap();
+
+            }
+            
+
+            if conn.affected_rows() > 0 {
+
+                return r#"{"message": "1"}"#; // 成功
+
+            } else {
+
+                return r#"{"message": "2"}"#; // 成功，数据未更改
+
+            }
+
+        } else {
+
+            return r#"{"message": "0"}"#; //不是管理员不能修改
+        }
+    }
+    
+    return r#"{"message": "-1"}"#; // 未知错误
 }
 
 #[launch]
@@ -275,7 +403,8 @@ fn rocket() -> _ {
                                   login_do, 
                                   logout, 
                                   admin,
-                                  change_flight])
+                                  change_flight,
+                                  change_user])
         .mount("/", FileServer::from(relative!("static")))
         .attach(Template::fairing())
 }

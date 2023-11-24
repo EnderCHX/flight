@@ -1,6 +1,5 @@
 use mysql::{PooledConn, prelude::Queryable};
 
-use crate::initdb;
 
 pub struct User {
     pub uid: i32,

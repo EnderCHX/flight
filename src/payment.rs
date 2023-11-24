@@ -1,5 +1,6 @@
 pub struct Payment {
-    uid: u32,
+    uid: i32,
+    num: i32,
     amount: i32,
-    sum: f64,
+    time: i32,
 }

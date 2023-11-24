@@ -1,0 +1,92 @@
+.flights-container {
+    margin-bottom: 20px;
+}
+
+.flight-item {
+    margin-bottom: 10px;
+}
+
+.user-item {
+    margin-bottom: 10px;
+}
+
+.flight-info, .user-info {
+    width: 100px;
+    padding: 5px;
+    margin-right: 10px;
+}
+
+input[type="button"] {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin-top: 5px;
+    cursor: pointer;
+}
+
+input[type="button"]:hover {
+    background-color: #45a049;
+}
+
+input[type="text"] {
+    border: 1px solid #ccc;
+    padding: 5px;
+    font-size: 14px;
+}
+
+input[type="text"][readonly] {
+    background-color: #f3f3f3;
+}
+
+body {
+    background-image: url("/img/background.jpg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+  }
+  
+.switch input {
+display: none;
+}
+
+.slider {
+position: absolute;
+cursor: pointer;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background-color: #ccc;
+transition: .4s;
+}
+
+.slider:before {
+position: absolute;
+content: "";
+height: 26px;
+width: 26px;
+left: 4px;
+bottom: 4px;
+background-color: white;
+transition: .4s;
+}
+
+input:checked + .slider {
+background-color: #2196F3;
+}
+
+input:checked + .slider:before {
+transform: translateX(26px);
+}
