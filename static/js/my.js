@@ -224,3 +224,4 @@ function change_user(e) {
 function buy(e) {
     window.location.href = `/buy?num=${e}`;
 }
+

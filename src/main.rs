@@ -7,7 +7,7 @@ use rocket::data;
 use rocket::http::CookieJar;
 use rocket::response::content::RawHtml;
 use rocket::fs::{FileServer, relative};
-use rocket::response::{status, Redirect};
+use rocket::response::{status, Redirect, Responder};
 use rocket_dyn_templates::*;
 use rand::Rng;
 use initdb::DbInfo;
@@ -15,6 +15,7 @@ use chrono::*;
 use user::User;
 
 
+mod cors;
 mod initdb;
 mod user;
 mod flight;
@@ -50,6 +51,8 @@ async fn index(cookies: &CookieJar<'_>) -> Template {
         cookies.add_private(("username", format!("guest{}", randid)));
         cookies.add_private(("if_guest", "1"));
 
+        Redirect::to(uri!(index));
+
     } else {
         return Template::render("index", context! {
             name: {
@@ -73,6 +76,15 @@ async fn index(cookies: &CookieJar<'_>) -> Template {
     Template::render("error", context! {
         error: "已退出登录，请刷新"
     })
+}
+
+#[get("/ys/uid/<uid>")]
+async fn ys(uid: &str) -> String {
+
+    let client = reqwest::Client::new();
+    let response = client.get(format!("https://enka.network/api/uid/{}", uid))
+        .send().await.unwrap();
+    response.text().await.unwrap()
 }
 
 #[get("/buy?<num>")]
@@ -394,7 +406,7 @@ async fn change_user(cookies: &CookieJar<'_>, data: &str) -> &'static str {
 #[launch]
 fn rocket() -> _ {
     rocket::build()
-        .mount("/", routes![index, 
+        .mount("/", routes![index, ys, 
                                   buy, 
                                   search, 
                                   register, 
@@ -407,4 +419,5 @@ fn rocket() -> _ {
                                   change_user])
         .mount("/", FileServer::from(relative!("static")))
         .attach(Template::fairing())
+        .attach(cors::get_cors())
 }
