@@ -9,8 +9,9 @@
 
 <body>
     <div>
-        <p>确认订单 订单号 : {{uid}}-{{num}}-{{time}}</p>
-        <p><input type="text" placeholder="请输入整数" oninput="validInteger(this)" autocomplete="off"></p>
+        <p>确认订单 订单号 : <label id="uid">{{uid}}</label>-<label id="num">{{num}}</label>-<label id="time">{{time}}</label></p>
+        <p><input type="text" placeholder="请输入整数" oninput="validInteger(this)" autocomplete="off" id="amount"></p>
+        <p><input type="button" value="支付" onclick="pay()"></p>
     </div>
     <script>
         function validInteger(input) {

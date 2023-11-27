@@ -59,12 +59,12 @@ function register() {
             .then((response) => response.json())
             .then((data) => {
                 console.log("Success:", data);
-                if (data["message"] == 1) {
+                if (data["retcode"] == 1) {
                     document.getElementById("info").innerHTML = "注册成功，准备跳转";
                     sleep(2000).then(() => {
                         home();
                     })
-                } else if (data["message"] == 2) {
+                } else if (data["retcode"] == 2) {
                     document.getElementById("info").innerHTML = "注册失败，用户存在";
                 } else {
                     document.getElementById("info").innerHTML = "登录失败，未知错误";
@@ -105,14 +105,14 @@ function login() {
             .then((response) => response.json())
             .then((data) => {
                 console.log("Success:", data);
-                if (data["message"] == 1) {
+                if (data["retcode"] == 1) {
                     document.getElementById("info").innerHTML = "登录成功，准备跳转";
                     sleep(2000).then(() => {
                         home();
                     })
-                } else if (data["message"] == 2) {
+                } else if (data["retcode"] == 2) {
                     document.getElementById("info").innerHTML = "登录失败，用户名或者密码错误";
-                } else if (data["message"] == -1) {
+                } else if (data["retcode"] == 0) {
                     document.getElementById("info").innerHTML = "登录失败，用户不存在";
                 } else {
                     document.getElementById("info").innerHTML = "登录失败，未知错误";
@@ -164,13 +164,13 @@ function change_flight(e, type) {
     }).then((response) => response.json())
     .then((data) => {
         console.log(data);
-        if (data["message"] == 1) {
+        if (data["retcode"] == 1) {
             alert("增加成功");
             location.reload();
-        } else if (data["message"] == 2 ) {
+        } else if (data["retcode"] == 2 ) {
             alert("修改成功");
             location.reload();
-        } else if (data["message"] ==3 ) {
+        } else if (data["retcode"] ==3 ) {
             alert("删除成功");
             location.reload();
         } else {
@@ -203,10 +203,10 @@ function change_user(e) {
     }).then((response) => response.json())
     .then((data) => {
         console.log(data);
-        if (data["message"] == 1) {
+        if (data["retcode"] == 1) {
             alert("用户修改成功");
             location.reload();
-        }else if (data["message"] == 2) {
+        }else if (data["retcode"] == 2) {
             alert("修改成功但未做更改");
             location.reload()
         }else {
@@ -225,3 +225,35 @@ function buy(e) {
     window.location.href = `/buy?num=${e}`;
 }
 
+function pay() {
+    let data = {
+        uid: getE("uid").innerHTML,
+        num: getE("num").innerHTML,
+        amount: getE("amount").value,
+        time: getE("time").innerHTML,
+    };
+
+    fetch("/pay", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data)
+    }).then((response) => response.json())
+    .then((data) => {
+        console.log(data);
+        if (data["retcode"] == 1) {
+            alert("购买成功");
+            history.back();
+        }else if (data["retcode"] == 2) {
+            alert(data["message"]);
+            history.back();
+        }else {
+            alert("未知错误");
+            history.back();
+        }
+    })
+    .catch((error) => {
+        console.log(error);
+    })
+}

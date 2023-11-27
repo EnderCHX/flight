@@ -26,12 +26,12 @@
             <li>暂时没有这个航班哦，看看所有航班吧</li>
             <li>航班号|出发地|目的地|起飞机场|降落机场|起飞时间|降落时间|票价|票数|已订</li>
             {% for s in all %}
-                <li>{{ s }} <input type="button" value="购买"></li>
+                <li>{{ s }} <input type="button" value="购买" onclick="buy({{s.0}})"></li>
             {% endfor %}
         {% elif ifres > 0 and if_all == false %}
                 <li>航班号|出发地|目的地|起飞机场|降落机场|起飞时间|降落时间|票价|票数|已订</li>
             {% for s in result %}
-                <li>{{ s }} <input type="button" value="购买" ></li>
+                <li>{{ s }} <input type="button" value="购买" onclick="buy({{s.0}})"></li>
             {% endfor %}
         {% endif %}
 

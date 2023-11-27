@@ -48,8 +48,8 @@ impl DbInfo {
                 arrive_city VARCHAR(128) NOT NULL,
                 leave_airport VARCHAR(128) NOT NULL,
                 arrive_airport VARCHAR(128) NOT NULL,
-                leave_time INT NOT NULL,
-                arrive_time INT NOT NULL,
+                leave_time BIGINT NOT NULL,
+                arrive_time BIGINT NOT NULL,
                 price DOUBLE NOT NULL,
                 capacity INT NOT NULL,
                 booked INT NOT NULL,
@@ -64,7 +64,7 @@ impl DbInfo {
                 num INT NOT NULL,
                 uid INT NOT NULL,
                 amount INT NOT NULL,
-                time INT NOT NULL
+                time BIGINT NOT NULL
             )
             ",
         ).expect("Failed to create payments table");

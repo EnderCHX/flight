@@ -106,6 +106,67 @@ async fn buy(cookies: &CookieJar<'_>, num: i32) -> Template {
     })
 }
 
+#[post("/pay", format = "json", data = "<data>")]
+async fn pay(cookies: &CookieJar<'_>, data: &str) -> &'static str {
+
+    let if_guest = {
+        let if_guest = cookies.get_private("if_guest").unwrap().to_string();
+        if if_guest.len() > 8 {
+            if_guest[9..].to_string()
+        } else {
+            "1".to_string()
+        }
+    };
+    
+    if if_guest == "1" {
+        return r#"{"message": "请登录", "retcode": "0"}"#;
+    } else {
+        let data = json::parse(data).unwrap();
+        /*
+        {
+            "uid": uid,
+            "num": num,
+            "time": time,
+            "amount": amount
+        }
+         */
+
+        let mut conn = POOL.get_conn().unwrap();
+        let mut flight_info: Vec<(i32, i32)> = conn.query(format!("
+        SELECT capacity, booked
+        FROM flights WHERE num = {}
+        ", data["num"])).unwrap();
+
+        if flight_info.len() == 1 {
+            let amount: i32 = match data["amount"].to_string().parse::<i32>() {
+                Ok(parsed_amount) => parsed_amount,
+                Err(e) => {
+                    println!("{}", e);
+                    println!("{:?}", data);
+                    return r#"{"message": "传入数据错误", "retcode": "-1"}"#;
+                }
+            };
+            if flight_info[0].0 - flight_info[0].1 > amount {
+
+                flight_info[0].1 += amount;
+                conn.query_drop(format!("
+                UPDATE flights SET booked = {} WHERE num = {}
+                ", flight_info[0].1, data["num"])).unwrap();
+
+                conn.query_drop(format!("
+                INSERT INTO payments (num, uid, amount, time)
+                VALUES ({}, {}, {}, {})
+                ", data["num"], data["uid"], data["amount"], data["time"])).unwrap();
+
+                r#"{"message": "购买成功", "retcode": "1"}"#;
+            } else {
+                r#"{"message": "购买数量大于剩余数量或者机票已经售完", "retcode": "2"}"#;
+            }
+        }
+    }
+    return r#"{"message": "未知错误", "retcode": "-1"}"#;
+}
+
 #[get("/search?<leave>&<arrive>")]
 async fn search(leave: &str, arrive: &str) -> Template {
 
@@ -159,11 +220,11 @@ async fn register_do(cookies: &CookieJar<'_>, data: String) -> &'static str {
         cookies.remove_private("username");
         cookies.add_private(("username", data["username"].to_string()));
         cookies.add_private(("if_guest", "0"));
-        return "{\"message\": 1}"; //注册成功
+        return r#"{"message": "注册成功", "retcode": 1}"#; //注册成功
     } else if status == 2 {
-        return "{\"message\": 2}"; // 用户存在
+        return r#"{"message": "用户存在", "retcode": 2}"#; // 用户存在
     } else {
-        return "{\"message\": 0}"; // 未知错误
+        return r#"{"message": "未知错误", "retcode": -1}"#; // 未知错误
     }
 }
 
@@ -195,13 +256,13 @@ async fn login_do(cookies: &CookieJar<'_>, data: String) -> &'static str {
         cookies.remove_private("username");
         cookies.add_private(("username", data["username"].to_string()));
         cookies.add_private(("if_guest", "0"));
-        return "{\"message\": 1}"; // 成功
+        return r#"{"message": "成功", "retcode": 1}"#; // 成功
     } else if status_code == 2 {
-        return "{\"message\": 2}"; // 密码错误
+        return r#"{"message": "密码错误", "retcode": 2}"#; // 密码错误
     } else if status_code == -1 {
-        return "{\"message\": -1}"; // 用户不存在
+        return r#"{"message": "用户不存在", "retcode": 0}"#; // 用户不存在
     } else {
-        return "{\"message\": 0}"; // 未知错误
+        return r#"{"message": "未知错误", "retcode": -1}"#; // 未知错误
     }
 }
 
@@ -301,7 +362,7 @@ fn change_flight(cookies: &CookieJar<'_>, data: &str) -> &'static str {
                 data["info"]["leave_time"], data["info"]["arrive_time"], data["info"]["price"],       data["info"]["capacity"],      data["info"]["booked"]
                 )).unwrap();
 
-                return r#"{"message": "1"}"#; // 新增成功
+                return r#"{"message": "新增成功", "retcode": "1"}"#; // 新增成功
 
             } else if data["type"] == 1 {
 
@@ -313,7 +374,7 @@ fn change_flight(cookies: &CookieJar<'_>, data: &str) -> &'static str {
                 data["info"]["leave_time"], data["info"]["arrive_time"], data["info"]["price"], data["info"]["capacity"], data["info"]["booked"], data["info"]["num"]
                 )).unwrap();
 
-                return r#"{"message": "2"}"#; // 修改成功
+                return r#"{"message": "修改成功", "retcode": "2"}"#; // 修改成功
 
             } else if data["type"] == 2 {
 
@@ -322,21 +383,21 @@ fn change_flight(cookies: &CookieJar<'_>, data: &str) -> &'static str {
                 WHERE num = {}"#, data["info"]["num"]
                 )).unwrap();
 
-                return r#"{"message": "3"}"#; //删除成功
+                return r#"{"message": "删除成功", "retcode": "3"}"#; //删除成功
 
             } else {
 
-                return r#"{"message": "-1"}"#; // 未知操作类型
+                return r#"{"message": "未知操作类型", "retcode": "-1"}"#; // 未知操作类型
 
             }
         } else {
 
-            return r#"{"message": "0"}"#; //不是管理员不能修改
+            return r#"{"message": "不是管理员不能修改", "retcode": "0"}"#; //不是管理员不能修改
 
         }
     }
 
-    return r#"{"message": "-1"}"#; // 未知错误
+    return r#"{"message": "未知错误", "retcode": "-1"}"#; // 未知错误
 }
 
 #[post("/admin/cuser", format = "json", data = "<data>")]
@@ -386,28 +447,28 @@ async fn change_user(cookies: &CookieJar<'_>, data: &str) -> &'static str {
 
             if conn.affected_rows() > 0 {
 
-                return r#"{"message": "1"}"#; // 成功
+                return r#"{"message": "成功", "retcode": "1"}"#; // 成功
 
             } else {
 
-                return r#"{"message": "2"}"#; // 成功，数据未更改
+                return r#"{"message": "成功，数据未更改", "retcode": "2"}"#; // 成功，数据未更改
 
             }
 
         } else {
 
-            return r#"{"message": "0"}"#; //不是管理员不能修改
+            return r#"{"message": "不是管理员不能修改", "retcode": "0"}"#; //不是管理员不能修改
         }
     }
     
-    return r#"{"message": "-1"}"#; // 未知错误
+    return r#"{"message": "未知错误", "retcode": "-1"}"#; // 未知错误
 }
 
 #[launch]
 fn rocket() -> _ {
     rocket::build()
         .mount("/", routes![index, ys, 
-                                  buy, 
+                                  buy, pay,
                                   search, 
                                   register, 
                                   register_do, 
