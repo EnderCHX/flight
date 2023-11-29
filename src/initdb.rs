@@ -61,8 +61,8 @@ impl DbInfo {
         conn.query_drop(
             r"
             CREATE TABLE IF NOT EXISTS payments (
-                num INT NOT NULL,
                 uid INT NOT NULL,
+                num INT NOT NULL,
                 amount INT NOT NULL,
                 time BIGINT NOT NULL
             )

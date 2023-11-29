@@ -257,3 +257,31 @@ function pay() {
         console.log(error);
     })
 }
+
+drop_pay = (e) => {
+
+    let data = {
+        type: 1,
+        data: {
+            uid: getE("uid").value,
+            num: getE(`num_${e}`).innerHTML,
+            time: e
+        }
+    };
+
+    fetch("/user", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data)
+    }).then((response) => response.json())
+    .then((data) => {
+        console.log(data);
+
+        alert(data["message"]);
+
+    }).catch((error) => {
+        console.log(error)
+    })
+}
