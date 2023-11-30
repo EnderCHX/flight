@@ -22,6 +22,6 @@
         <input type="password" placeholder="旧密码" id="old_password" class="user_info" autocomplete="off">
         <input type="password" placeholder="新密码" id="new_password" class="user_info" autocomplete="off">
         <input type="password" placeholder="重复密码" id="re_new_password" class="user_info" autocomplete="off">
-        <input type="button" value="修改" class="user_info" >
+        <input type="button" value="修改" class="user_info" onclick="user_change()">
     </div>
 </body>

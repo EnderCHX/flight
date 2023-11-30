@@ -1,6 +1,6 @@
 use mysql::{PooledConn, prelude::Queryable};
 
-
+#[derive(Debug)]
 pub struct User {
     pub uid: i32,
     pub username: String,

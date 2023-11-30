@@ -242,16 +242,11 @@ function pay() {
     }).then((response) => response.json())
     .then((data) => {
         console.log(data);
-        if (data["retcode"] == 1) {
-            alert("购买成功");
-            history.back();
-        }else if (data["retcode"] == 2) {
-            alert(data["message"]);
-            history.back();
-        }else {
-            alert("未知错误");
-            history.back();
-        }
+        alert(data["message"]);
+        history.back();
+        setTimeout(function() {
+            location.reload();
+        }, 1000);
     })
     .catch((error) => {
         console.log(error);
@@ -280,6 +275,37 @@ drop_pay = (e) => {
         console.log(data);
 
         alert(data["message"]);
+        location.reload();
+
+    }).catch((error) => {
+        console.log(error)
+    })
+}
+
+user_change = () => {
+
+    let data = {
+        type: 2,
+        data: {
+            username: getE("username").value,
+            old_password: md5(getE("old_password").value),
+            new_password: md5(getE("new_password").value),
+            re_new_password: md5(getE("re_new_password").value),
+        }
+    };
+
+    fetch("/user", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data)
+    }).then((response) => response.json())
+    .then((data) => {
+        console.log(data);
+
+        alert(data["message"]);
+        location.reload();
 
     }).catch((error) => {
         console.log(error)

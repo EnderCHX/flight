@@ -1,7 +1,9 @@
 #[macro_use] extern crate rocket;
+use json::JsonValue;
 use lazy_static::*;
 use mysql::prelude::*;
 use mysql::*;
+use payment::Payment;
 use rocket::http::CookieJar;
 use rocket::fs::{FileServer, relative};
 use rocket::response::Redirect;
@@ -10,6 +12,7 @@ use rand::Rng;
 use initdb::DbInfo;
 use chrono::*;
 use user::User;
+use flight::Flight;
 
 
 mod cors;
@@ -20,17 +23,26 @@ mod payment;
 
 
 lazy_static! {
-    static ref DB: DbInfo = DbInfo {
-        ip: String::from("localhost"),
-        port: String::from("3306"),
-        user: String::from("root"),
-        password: String::from("chxMIMA@"),
-        db_name: String::from("db_flight"),
+
+    static ref CONFIG: JsonValue = {
+
+        let config = std::fs::read_to_string("config.json").expect("读取配置失败");
+        json::parse(config.as_str()).expect("json转换失败")
+
     };
+
+    static ref DB: DbInfo =  DbInfo {
+        ip: CONFIG["mysql"]["ip"].to_string(),
+        port: CONFIG["mysql"]["port"].to_string(),
+        user: CONFIG["mysql"]["user"].to_string(),
+        password: CONFIG["mysql"]["password"].to_string(),
+        db_name: CONFIG["mysql"]["db_name"].to_string(),
+    };
+
     static ref POOL: Pool = {
         DB.init_db();
         let url = format!("mysql://{}:{}@{}:{}/{}", DB.user, DB.password, DB.ip, DB.port, DB.db_name);
-        let pool = Pool::new(url.as_str()).unwrap();
+        let pool = Pool::new(url.as_str()).expect("创建连接池失败");
         pool
     };
 }
@@ -53,7 +65,7 @@ async fn index(cookies: &CookieJar<'_>) -> Template {
     } else {
         return Template::render("index", context! {
             name: {
-                let username = cookies.get_private("username").unwrap().to_string();
+                let username = cookies.get_private("username").expect("获取cookie失败").to_string();
                 if username.len() > 8 {
                     username[9..].to_string()
                 } else {
@@ -61,7 +73,7 @@ async fn index(cookies: &CookieJar<'_>) -> Template {
                 }
             },
             if_guest: {
-                let if_guest = cookies.get_private("if_guest").unwrap().to_string();
+                let if_guest = cookies.get_private("if_guest").expect("获取cookie失败").to_string();
                 if if_guest.len() > 8 {
                     if_guest[9..].to_string()
                 } else {
@@ -80,18 +92,18 @@ async fn ys(uid: &str) -> String {
 
     let client = reqwest::Client::new();
     let response = client.get(format!("https://enka.network/api/uid/{}", uid))
-        .send().await.unwrap();
-    response.text().await.unwrap()
+        .send().await.expect("ys请求失败");
+    response.text().await.expect("响应失败")
 }
 
 #[get("/buy?<num>")]
 async fn buy(cookies: &CookieJar<'_>, num: i32) -> Template {
 
-    let username = cookies.get_private("username").unwrap().to_string();
+    let username = cookies.get_private("username").expect("获取cookie失败").to_string();
     let username = username[9..].to_string();
 
-    let mut conn = POOL.get_conn().unwrap();
-    let uid: Vec<i32> = conn.query(format!(r#"SELECT uid FROM users WHERE username = "{}""#, username)).unwrap();
+    let mut conn = POOL.get_conn().expect("数据库连接失败");
+    let uid: Vec<i32> = conn.query(format!(r#"SELECT uid FROM users WHERE username = "{}""#, username)).expect("数据库查询失败");
     let uid = {if uid.len() == 1 {uid[0]} else {0}};
 
     let time = Utc::now().timestamp();
@@ -107,7 +119,7 @@ async fn buy(cookies: &CookieJar<'_>, num: i32) -> Template {
 async fn pay(cookies: &CookieJar<'_>, data: &str) -> &'static str {
 
     let if_guest = {
-        let if_guest = cookies.get_private("if_guest").unwrap().to_string();
+        let if_guest = cookies.get_private("if_guest").expect("获取cookie失败").to_string();
         if if_guest.len() > 8 {
             if_guest[9..].to_string()
         } else {
@@ -118,7 +130,7 @@ async fn pay(cookies: &CookieJar<'_>, data: &str) -> &'static str {
     if if_guest == "1" {
         return r#"{"message": "请登录", "retcode": "0"}"#;
     } else {
-        let data = json::parse(data).unwrap();
+        let data = json::parse(data).expect("获取cookie失败");
         /*
         {
             "uid": uid,
@@ -128,33 +140,60 @@ async fn pay(cookies: &CookieJar<'_>, data: &str) -> &'static str {
         }
          */
 
-        let mut conn = POOL.get_conn().unwrap();
+        let payment = Payment {
+            uid: match data["uid"].to_string().parse::<i32>() {
+                Ok(uid) => uid,
+                Err(e) => {
+                    println!("{}", e);
+                    -1
+                }
+            }, 
+            num: match data["num"].to_string().parse::<i32>() {
+                Ok(num) => num,
+                Err(e) => {
+                    println!("{}", e);
+                    -1
+                }
+            },
+            amount: match data["amount"].to_string().parse::<i32>() {
+                Ok(amount) => amount,
+                Err(e) => {
+                    println!("{}", e);
+                    -1
+                }
+            },
+            time: match data["time"].to_string().parse::<i64>() {
+                Ok(time) => time,
+                Err(e) => {
+                    println!("{}", e);
+                    -1
+                }
+            }
+        };
+
+        let mut conn = POOL.get_conn().expect("数据库连接失败");
         let mut flight_info: Vec<(i32, i32)> = conn.query(format!("
         SELECT capacity, booked
         FROM flights WHERE num = {}
-        ", data["num"])).unwrap();
+        ", payment.num)).expect("查询失败");
 
-        println!("{:?}", flight_info);
         if flight_info.len() == 1 {
-            let amount: i32 = match data["amount"].to_string().parse::<i32>() {
-                Ok(parsed_amount) => parsed_amount,
-                Err(e) => {
-                    println!("{}", e);
-                    println!("{:?}", data);
-                    return r#"{"message": "传入数据错误", "retcode": "-1"}"#;
-                }
-            };
-            if flight_info[0].0 - flight_info[0].1 >= amount {
+            
+            if flight_info[0].0 - flight_info[0].1 >= payment.amount {
 
-                flight_info[0].1 += amount;
+                flight_info[0].1 += payment.amount;
                 conn.query_drop(format!("
                 UPDATE flights SET booked = {} WHERE num = {}
-                ", flight_info[0].1, data["num"])).unwrap();
+                ", flight_info[0].1, data["num"])).expect("数据库更新失败");
+
+                if data["amount"].to_string() == "" {
+                    return r#"{"message": "请输入数量", "retcode": "-1"}"#;
+                }
 
                 conn.query_drop(format!("
                 INSERT INTO payments (num, uid, amount, time)
                 VALUES ({}, {}, {}, {})
-                ", data["num"], data["uid"], data["amount"], data["time"])).unwrap();
+                ", data["num"], data["uid"], data["amount"], data["time"])).expect("数据库插入失败");
 
                 return r#"{"message": "购买成功", "retcode": "1"}"#;
             } else {
@@ -178,6 +217,20 @@ async fn search(leave: &str, arrive: &str) -> Template {
 
     for i in &res {
         if i.to_owned().1 == leave && i.to_owned().2 == arrive {
+            
+            let _f = Flight {
+                num: i.0,
+                capacity: i.8,
+                booked: i.9,
+                price: i.7,
+                leave_city: Some(i.to_owned().1),
+                arrive_city: Some(i.to_owned().2),
+                leave_airport: Some(i.to_owned().3),
+                arrive_airport: Some(i.to_owned().4),
+                leave_time: i.5, 
+                arrive_time: i.6, 
+            };
+
             result.push((i.0, i.to_owned().1, i.to_owned().2, i.to_owned().3, i.to_owned().4, i.5, i.6, i.7, i.8, i.9));
         }
     }
@@ -249,7 +302,6 @@ async fn login_do(cookies: &CookieJar<'_>, data: String) -> &'static str {
 
     let status_code = user.user_login(&mut conn);
 
-    println!("{:?}", data);
     if status_code == 1 {
         cookies.remove_private("username");
         cookies.add_private(("username", data["username"].to_string()));
@@ -417,8 +469,6 @@ async fn change_user(cookies: &CookieJar<'_>, data: &str) -> &'static str {
             
             let data = json::parse(data).unwrap();
 
-            println!("{:?}", data);
-
             let cuser = User {
                 uid: data["uid"].to_string().parse::<i32>().unwrap(),
                 username: data["username"].to_string(),
@@ -474,19 +524,33 @@ async fn user_(cookies: &CookieJar<'_>) -> Template {
         admin: false
     };
 
-    let mut conn = POOL.get_conn().unwrap();
+    let mut conn = POOL.get_conn().expect("数据库连接失败");
+
+    let info: Vec<(i32, i32, i32, i64, i32, String, String, bool)> = conn.query(format!(r#"
+        SELECT * FROM payments
+        JOIN users ON users.uid = payments.uid AND username = "{}"
+        "#, user.username)).expect("error in user()");
     
-    conn.query_map(format!("
-        SELECT uid, admin FROM users WHERE username = '{}'", 
-        user.username),
-        | (uid, admin)| {
-            user.uid = uid;
-            user.admin = admin;
-        }).unwrap();
-    
-    let pay_list: Vec<(i32, i32, i64)> = conn.query(format!("
-    SELECT num, amount, time FROM payments WHERE uid = {}", 
-    user.uid)).unwrap();
+    if info.len() > 0 {
+        user.uid = info[0].0;
+        user.username = info[0].5.clone();
+        user.password = String::from("Do not see");
+        user.admin = info[0].7;
+    } else {
+        conn.query_map(format!("
+            SELECT uid, admin FROM users WHERE username = '{}'", 
+            user.username),
+            | (uid, admin)| {
+                user.uid = uid;
+                user.admin = admin;
+            }).unwrap();
+    }
+
+    let mut pay_list: Vec<(i32, i32, i64)> = Vec::new();
+
+    for i in info {
+        pay_list.push((i.1, i.2, i.3));
+    }
 
     Template::render("user", context!{
         username: user.username,
@@ -498,7 +562,7 @@ async fn user_(cookies: &CookieJar<'_>) -> Template {
 #[post("/user", format = "json", data = "<data>")]
 async fn user_do(cookies: &CookieJar<'_>, data: &str) -> &'static str {
 
-    let get_name = cookies.get_private("username").unwrap().to_string();
+    let get_name = cookies.get_private("username").expect("获取cookie失败").to_string();
 
     let mut user = User {
         uid: -1,
@@ -516,13 +580,13 @@ async fn user_do(cookies: &CookieJar<'_>, data: &str) -> &'static str {
             user.uid = uid;
             user.password = password;
             user.admin = admin;
-        }).unwrap();
+        }).expect("查询数据库失败");
 
-    let data = json::parse(data).unwrap();
+    let data = json::parse(data).expect("json数据转换失败");
     
     /*
     {
-        "type": "1\2\", //change username && change passwd, drop payments
+        "type": "1\2\", //drop payments, change username && change passwd
         "data": {
             "username": new name,
             "old_password": hash,
@@ -559,7 +623,7 @@ async fn user_do(cookies: &CookieJar<'_>, data: &str) -> &'static str {
 
             conn.query_map(format!("
                 SELECT booked FROM flights WHERE num = {}", 
-                data["data"]["num"]), | e | {booked = e;} ).unwrap();
+                data["data"]["num"]), | e | {booked = e;} ).expect("查询失败");
             
             let booked = booked - amount;
 
@@ -568,7 +632,7 @@ async fn user_do(cookies: &CookieJar<'_>, data: &str) -> &'static str {
             conn.query_drop(format!("
                 DELETE FROM payments
                 WHERE uid = {} AND num = {} AND time = {}
-                ", data["data"]["uid"], data["data"]["num"], data["data"]["time"])).unwrap();
+                ", data["data"]["uid"], data["data"]["num"], data["data"]["time"])).expect("数据库删除失败");
 
             if conn.affected_rows() > 0 {
 
@@ -594,7 +658,7 @@ async fn user_do(cookies: &CookieJar<'_>, data: &str) -> &'static str {
 
                 conn.query_drop(format!(r#"
                 UPDATE users SET username = "{}", password = "{}" WHERE uid = {}
-                "#, data["data"]["username"], data["data"]["new_password"], user.uid)).unwrap();
+                "#, data["data"]["username"], data["data"]["new_password"], user.uid)).expect("数据库更新失败");
 
                 if conn.affected_rows() > 0 {
 
@@ -605,7 +669,7 @@ async fn user_do(cookies: &CookieJar<'_>, data: &str) -> &'static str {
 
                 } else {
                     
-                    return r#"{"message": "修改失败，数据库操作失败", "retcode": "-2"}"#;
+                    return r#"{"message": "修改失败，数据库操作失败；或未做更改", "retcode": "-2"}"#;
 
                 }
 

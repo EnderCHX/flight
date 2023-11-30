@@ -1,19 +1,12 @@
-use crate::initdb::DbInfo;
 pub struct Flight {
-    num: i32,
-    capacity: i32,
-    booked: i32,
-    price: f64,
-    leave_city: Option<String>,
-    arrive_city: Option<String>,
-    leave_airport: Option<String>,
-    arrive_airport: Option<String>,
-    leave_time: i64,
-    arrive_time: i64,
-}
-
-impl Flight {
-    pub fn search() {
-
-    }
+    pub num: i32,
+    pub capacity: i32,
+    pub booked: i32,
+    pub price: f64,
+    pub leave_city: Option<String>,
+    pub arrive_city: Option<String>,
+    pub leave_airport: Option<String>,
+    pub arrive_airport: Option<String>,
+    pub leave_time: i64,
+    pub arrive_time: i64,
 }
