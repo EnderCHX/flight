@@ -35,11 +35,11 @@ function sleep (time) {
 //注册
 function register() {
     console.log("hello");
-    let username = document.getElementById("username").value;
-    let password = document.getElementById("password").value;
+    let username = document.getElementById("username1").value;
+    let password = document.getElementById("password1").value;
     let password2 = document.getElementById("password2").value;
     if (username == "") {
-        document.getElementById("info").innerHTML = "用户名不能为空";
+        document.getElementById("info1").innerHTML = "用户名不能为空";
     } else {
         if (password == password2) {
             let hash = md5(password); //备用"skOR7oRda5iypO1ejFnmyd2MkDOlYUHG0STBMDBDTXo="
@@ -60,21 +60,21 @@ function register() {
             .then((data) => {
                 console.log("Success:", data);
                 if (data["retcode"] == 1) {
-                    document.getElementById("info").innerHTML = "注册成功，准备跳转";
+                    document.getElementById("info1").innerHTML = "注册成功，准备跳转";
                     sleep(2000).then(() => {
                         home();
                     })
                 } else if (data["retcode"] == 2) {
-                    document.getElementById("info").innerHTML = "注册失败，用户存在";
+                    document.getElementById("info1").innerHTML = "注册失败，用户存在";
                 } else {
-                    document.getElementById("info").innerHTML = "登录失败，未知错误";
+                    document.getElementById("info1").innerHTML = "登录失败，未知错误";
                 }
             })
             .catch((error) => {
                 console.error("Error:", error);
             });
         } else {
-            document.getElementById("info").innerHTML = "密码不一致";
+            document.getElementById("info1").innerHTML = "密码不一致";
         }
     }
 }

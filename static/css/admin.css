@@ -1,0 +1,130 @@
+body, html {
+    height: 100%;
+    margin: 0;
+}
+
+h1 {
+    mix-blend-mode: difference;
+}
+
+
+body {
+    background-image: url("/img/background4.jpg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    text-align: center;
+}
+
+.switch_button {
+    margin-top: 2%;
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+
+    color: #fff;
+    background: linear-gradient(to right, #4CAF50, #45a049);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s ease;
+  }
+  
+.switch_button:hover {
+    background: linear-gradient(to right, #45a049, #4CAF50);
+}
+
+.top {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    top: 0;
+    left: 0;
+    background-image: url("/img/background2.png");
+    height: 8%;
+
+}
+
+.top .user {
+    display: flex;
+    flex-direction: row;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 15%;
+    background-image: url("/img/background3.png");
+    /* mix-blend-mode: difference; */
+}
+
+.top .user .avatar {
+    max-height: 100%;
+    margin-right: 5%;
+}
+
+.top .top_left {
+    margin-left: 1%;
+}
+
+
+.custom-font {
+    font-family: 'Arial', sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    color: #ffffff;
+    mix-blend-mode: difference;
+}
+
+.container {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: space-around;
+    height: 92%;
+}
+
+.left {
+    display: flex;
+    flex-direction: column;
+    color: aquamarine;
+    opacity: 0.8;
+    width: 30%;
+    height: 100%;
+    border-right: 2px solid #ffffff;
+
+}
+
+.flight_info {
+    display: flex;
+    visibility: visible;
+    flex-direction: column;
+    overflow: auto;
+}
+
+.info_flight {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.change_info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.flight_word {
+    mix-blend-mode: difference;
+}
+
+.user_info {
+    display: flex;
+    visibility: hidden;
+    overflow: auto;
+    flex-direction: column;
+}

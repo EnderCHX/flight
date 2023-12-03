@@ -40,6 +40,8 @@ impl DbInfo {
             INSERT IGNORE INTO users VALUES (1, 'admin', '21232f297a57a5a743894a0e4a801fc3', 1)
             ",
         ).expect("Failed to create users table");
+
+        
         conn.query_drop(
             r"
             CREATE TABLE IF NOT EXISTS flights (

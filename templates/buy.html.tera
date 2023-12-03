@@ -4,7 +4,7 @@
     <title>订单号 : {{uid}}-{{num}}-{{time}}</title>
     <script src="/js/my.js"></script>
     <script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="/css/my.css">
+    <link rel="stylesheet" type="text/css" href="/css/all.css">
 </head>
 
 <body>

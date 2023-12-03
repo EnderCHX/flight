@@ -358,7 +358,14 @@ async fn admin(cookies: &CookieJar<'_>) -> Template {
         }
         
         return Template::render("admin", context!{
-            name: 123,
+            name: {
+                let username = cookies.get_private("username").expect("获取cookie失败").to_string();
+                if username.len() > 8 {
+                    username[9..].to_string()
+                } else {
+                    "null".to_string()
+                }
+            },
             flights: flights_list,
             users: users_list,
         })
