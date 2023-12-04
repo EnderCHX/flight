@@ -1,0 +1,10 @@
+"filename", "language", "HTML", "comment", "blank", "total"
+"/run/media/enderchx/Data/code/rust/flight/templates/admin.html.tera", "HTML", 96, 0, 14, 110
+"/run/media/enderchx/Data/code/rust/flight/templates/buy.html.tera", "HTML", 28, 0, 3, 31
+"/run/media/enderchx/Data/code/rust/flight/templates/error.html.tera", "HTML", 17, 0, 2, 19
+"/run/media/enderchx/Data/code/rust/flight/templates/index.html.tera", "HTML", 93, 0, 6, 99
+"/run/media/enderchx/Data/code/rust/flight/templates/login.html.tera", "HTML", 15, 0, 4, 19
+"/run/media/enderchx/Data/code/rust/flight/templates/register.html.tera", "HTML", 16, 0, 0, 16
+"/run/media/enderchx/Data/code/rust/flight/templates/search.html.tera", "HTML", 145, 0, 20, 165
+"/run/media/enderchx/Data/code/rust/flight/templates/user.html.tera", "HTML", 101, 0, 16, 117
+"Total", "-", 511, 0, 65, 576

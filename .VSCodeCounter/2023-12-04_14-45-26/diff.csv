@@ -1,0 +1,17 @@
+"filename", "language", "HTML", "CSS", "JavaScript", "comment", "blank", "total"
+"/run/media/enderchx/Data/code/rust/flight/static/css/admin.css", "CSS", 0, -123, 0, 0, -30, -153
+"/run/media/enderchx/Data/code/rust/flight/static/css/all.css", "CSS", 0, -110, 0, 0, -19, -129
+"/run/media/enderchx/Data/code/rust/flight/static/css/button&input.css", "CSS", 0, -77, 0, -8, -12, -97
+"/run/media/enderchx/Data/code/rust/flight/static/css/index.css", "CSS", 0, -23, 0, 0, -7, -30
+"/run/media/enderchx/Data/code/rust/flight/static/css/search.css", "CSS", 0, -47, 0, 0, -13, -60
+"/run/media/enderchx/Data/code/rust/flight/static/css/user.css", "CSS", 0, -90, 0, 0, -24, -114
+"/run/media/enderchx/Data/code/rust/flight/static/js/my.js", "JavaScript", 0, 0, -298, -6, -31, -335
+"/run/media/enderchx/Data/code/rust/flight/templates/admin.html.tera", "HTML", 96, 0, 0, 0, 14, 110
+"/run/media/enderchx/Data/code/rust/flight/templates/buy.html.tera", "HTML", 28, 0, 0, 0, 3, 31
+"/run/media/enderchx/Data/code/rust/flight/templates/error.html.tera", "HTML", 17, 0, 0, 0, 2, 19
+"/run/media/enderchx/Data/code/rust/flight/templates/index.html.tera", "HTML", 93, 0, 0, 0, 6, 99
+"/run/media/enderchx/Data/code/rust/flight/templates/login.html.tera", "HTML", 15, 0, 0, 0, 4, 19
+"/run/media/enderchx/Data/code/rust/flight/templates/register.html.tera", "HTML", 16, 0, 0, 0, 0, 16
+"/run/media/enderchx/Data/code/rust/flight/templates/search.html.tera", "HTML", 145, 0, 0, 0, 20, 165
+"/run/media/enderchx/Data/code/rust/flight/templates/user.html.tera", "HTML", 101, 0, 0, 0, 16, 117
+"Total", "-", 511, -470, -298, -14, -71, -342

@@ -1,0 +1,97 @@
+/* 重置输入框和按钮的样式 */
+
+input,
+button {
+    background: transparent;
+    border: none;
+    outline: none;
+}
+
+.btn {
+    padding: 10px 20px;
+    margin-top: 30px;
+    color: #03e9f4;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn:hover {
+    background-color: #03e9f4;
+    border-radius: 5px;
+    color: #fff;
+    /* text-transform: uppercase; */
+    /* 文字大写 */
+    /* letter-spacing: 2px; */
+    /* 字母间隔 */
+}
+
+.btn>span {
+    position: absolute;
+}
+
+.btn>span:nth-child(1) {
+    width: 100%;
+    height: 2px;
+    background-image: linear-gradient(to right, transparent, #03e9f4);
+    left: -100%;
+    top: 0;
+    animation: span-line-one 1s linear infinite;
+}
+
+.btn>span:nth-child(2) {
+    width: 2px;
+    height: 100%;
+    background-image: linear-gradient(to bottom, transparent, #03e9f4);
+    right: 0;
+    top: -100%;
+    /* 延迟 0.25s */
+    animation: span-line-two 1s .25s linear infinite;
+}
+
+.btn>span:nth-child(3) {
+    width: 100%;
+    height: 2px;
+    background-image: linear-gradient(to left, transparent, #03e9f4);
+    left: 100%;
+    bottom: 0;
+    /* 延迟 0.5s */
+    animation: span-line-three 1s .5s linear infinite;
+}
+
+.btn>span:nth-child(4) {
+    width: 2px;
+    height: 100%;
+    background-image: linear-gradient(to top, transparent, #03e9f4);
+    left: 0;
+    bottom: -100%;
+    /* 延迟 0.75s */
+    animation: span-line-four 1s .75s linear infinite;
+}
+
+@keyframes span-line-one {
+    50%,
+    100% {
+        left: 100%;
+    }
+}
+
+@keyframes span-line-two {
+    50%,
+    100% {
+        top: 100%;
+    }
+}
+
+@keyframes span-line-three {
+    50%,
+    100% {
+        left: -100%;
+    }
+}
+
+@keyframes span-line-four {
+    50%,
+    100% {
+        bottom: 100%;
+    }
+}

@@ -1,0 +1,113 @@
+body, html {
+    height: 100%;
+    margin: 0;
+}
+
+
+
+body {
+    background-image: url("/img/background4.jpg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    text-align: center;
+}
+
+.switch_button {
+    margin-top: 2%;
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+
+    color: #fff;
+    background: linear-gradient(to right, #4CAF50, #45a049);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s ease;
+  }
+  
+.switch_button:hover {
+    background: linear-gradient(to right, #45a049, #4CAF50);
+}
+
+
+
+.custom-font {
+    font-family: 'Arial', sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    color: #ffffff;
+    mix-blend-mode: difference;
+}
+
+.container {
+    display: flex;
+    flex-direction: row;
+    height: 92%;
+}
+
+.left {
+    display: flex;
+    flex-direction: column;
+    color: aquamarine;
+    opacity: 0.8;
+    width: 20%;
+    height: 100%;
+    border-right: 2px solid #ffffff;
+
+}
+
+.flight_info {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    
+}
+
+.info_flight {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.change_info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.flight_word {
+    mix-blend-mode: difference;
+}
+
+.user_info {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+
+.info_user {
+    position: relative;
+
+    margin: 10px; 
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+.p1 {
+    width: 80%;
+    overflow: auto;
+}
+
+.p2 {
+    display: none;
+    width: 80%;
+    overflow: auto;
+}
+

@@ -1,0 +1,9 @@
+"filename", "language", "Rust", "comment", "blank", "total"
+"/run/media/enderchx/Data/code/rust/flight/src/cors.rs", "Rust", 12, 4, 3, 19
+"/run/media/enderchx/Data/code/rust/flight/src/flight.rs", "Rust", 12, 0, 1, 13
+"/run/media/enderchx/Data/code/rust/flight/src/initdb.rs", "Rust", 66, 2, 7, 75
+"/run/media/enderchx/Data/code/rust/flight/src/main.rs", "Rust", 527, 39, 162, 728
+"/run/media/enderchx/Data/code/rust/flight/src/payment.rs", "Rust", 6, 0, 1, 7
+"/run/media/enderchx/Data/code/rust/flight/src/routes.rs", "Rust", 314, 23, 97, 434
+"/run/media/enderchx/Data/code/rust/flight/src/user.rs", "Rust", 48, 2, 8, 58
+"Total", "-", 985, 70, 279, 1334

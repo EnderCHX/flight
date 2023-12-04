@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<head>
+    {% if leave != "all" and leave != "null" and arrive != "all" and arrive != "null" %}
+
+    <title>{{leave}} -> {{arrive}}</title>
+    
+    {% elif leave == "all" and arrive == "all" %}
+
+    <title>所有航班</title>
+
+    {% else %}
+
+    <title>没有这个航班哦</title>
+
+    {% endif %}
+    <script src="/js/my.js"></script>
+    <script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/css/search.css">
+</head>
+
+<body>
+    <div class = "top">
+        <div class = "top_left">
+            <h1 onclick="home()">机票售票系统</h1>
+        </div>
+        <div class = "user">
+            <img class="avatar" src="/img/chxw.png" onclick="window.location.href = '/admin'">
+            <p>你好：{{ name }} 
+            </p>
+        </div>
+    </div>
+    <div class="container"
+        <div class="result">
+            <p>
+            {% if ifres == 0 and if_all == false %}
+            <h1>暂时没有这个航班哦，看看所有航班吧</h1>
+            {% elif ifres > 0 and if_all == false %}
+            <h1>{{leave}} -> {{arrive}}</h1>
+            {% endif %}
+
+            {% if if_all == true %}
+            <h1>所有航班</h1>
+            {% endif %}
+            </p>
+
+            <p><table>
+                <thead>
+                    <tr>
+                        <td>航班号</td>
+                        <td>出发地</td>
+                        <td>目的地</td>
+                        <td>起飞机场</td>
+                        <td>降落机场</td>
+                        <td>起飞时间</td>
+                        <td>降落时间</td>
+                        <td>票价</td>
+                        <td>剩余票数</td>
+                        <td>点击购买</td>
+                    </tr>
+                </thead>
+                    {% if ifres == 0 and if_all == false %}
+                    <tbody>
+                        {% for s in all %}
+                        <tr>
+                            <td>{{ s.0 }}</td>
+                            <td>{{ s.1 }}</td>
+                            <td>{{ s.2 }}</td>
+                            <td>{{ s.3 }}</td>
+                            <td>{{ s.4 }}</td>
+                            <td id="leave_time_{{s.0}}">{{ s.5 }}</td>
+                            <td id="arrive_time_{{s.0}}">{{ s.6 }}</td>
+                            <td>{{ s.7 }}</td>
+                            <td>{{ s.8 - s.9 }}</td>
+                            <td><input type="button" value="购买" onclick="buy({{s.0}})"></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    {% elif ifres > 0 and if_all == false %}
+                    <tbody>
+                        {% for s in result %}
+                        <tr>
+                            <td>{{ s.0 }}</td>
+                            <td>{{ s.1 }}</td>
+                            <td>{{ s.2 }}</td>
+                            <td>{{ s.3 }}</td>
+                            <td>{{ s.4 }}</td>
+                            <td id="leave_time_{{s.0}}">{{ s.5 }}</td>
+                            <td id="arrive_time_{{s.0}}">{{ s.6 }}</td>
+                            <td>{{ s.7 }}</td>
+                            <td>{{ s.8 - s.9 }}</td>
+                            <td><input type="button" value="购买" onclick="buy({{s.0}})"></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    {% endif %}
+
+                    {% if if_all == true %}
+                    
+                    <tbody>
+                        {% for s in all %}
+                        <tr>
+                            <td>{{ s.0 }}</td>
+                            <td>{{ s.1 }}</td>
+                            <td>{{ s.2 }}</td>
+                            <td>{{ s.3 }}</td>
+                            <td>{{ s.4 }}</td>
+                            <td id="leave_time_{{s.0}}">{{ s.5 }}</td>
+                            <td id="arrive_time_{{s.0}}">{{ s.6 }}</td>
+                            <td>{{ s.7 }}</td>
+                            <td>{{ s.8 - s.9 }}</td>
+                            <td><input type="button" value="购买" onclick="buy({{s.0}})"></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    {% endif %}
+                
+            </table></p>
+            <p><input type="button" value="返回" id="return" onclick="home()"></p>
+        </div>
+    </div>
+    <script>
+        get_time_2 = (e) => {
+            let leave_time = getE(`leave_time_${e}`);
+            let arrive_time = getE(`arrive_time_${e}`);
+            let formatter = new Intl.DateTimeFormat('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                timeZone: 'Asia/Shanghai'
+            });
+
+            let date = formatter.format(parseInt(leave_time.innerHTML, 10)).slice(0, 16)
+            console.log(date)
+            leave_time.innerHTML = date
+
+            let date2 = formatter.format(parseInt(arrive_time.innerHTML, 10)).slice(0, 16)
+            console.log(date2)
+            arrive_time.innerHTML = date2
+        }
+
+
+        {% if if_all == true %}
+            {% for s in all %}
+                get_time_2({{s.0}})
+            {% endfor %}
+        {% endif %}
+
+        {% if ifres == 0 and if_all == false %}
+            {% for s in all %}
+                get_time_2({{s.0}})
+            {% endfor %}
+        {% elif ifres > 0 and if_all == false %}
+            {% for s in result %}
+                get_time_2({{s.0}})
+            {% endfor %}
+        {% endif %}
+
+    </script>
+    
+</body>
