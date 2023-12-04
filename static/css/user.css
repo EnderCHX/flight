@@ -5,7 +5,6 @@ body, html {
 
 
 
-
 body {
     background-image: url("/img/background4.jpg");
     background-position: center;
@@ -42,6 +41,7 @@ body {
     font-size: 18px;
     font-weight: bold;
     color: #ffffff;
+    mix-blend-mode: difference;
 }
 
 .container {
@@ -65,25 +65,25 @@ body {
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    justify-content: center;
     
 }
 
 .info_flight {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     justify-content: center;
-    border: 1px solid #ccc;
 }
 
 .change_info {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    border: 1px solid #ccc;
+    flex-wrap: wrap;
 }
 
-
+.flight_word {
+    mix-blend-mode: difference;
+}
 
 .user_info {
     display: flex;
@@ -111,43 +111,3 @@ body {
     overflow: auto;
 }
 
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 34px;
-  }
-
-.switch input {
-display: none;
-}
-
-.slider {
-position: absolute;
-cursor: pointer;
-top: 0;
-left: 0;
-right: 0;
-bottom: 0;
-background-color: #ccc;
-transition: .4s;
-}
-
-.slider:before {
-position: absolute;
-content: "";
-height: 26px;
-width: 26px;
-left: 4px;
-bottom: 4px;
-background-color: white;
-transition: .4s;
-}
-
-input:checked + .slider {
-background-color: #2196F3;
-}
-
-input:checked + .slider:before {
-transform: translateX(26px);
-}

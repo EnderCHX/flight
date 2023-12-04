@@ -3,9 +3,6 @@ body, html {
     margin: 0;
 }
 
-h1 {
-    mix-blend-mode: difference;
-}
 
 body {
     background-image: url("/img/background4.jpg");
@@ -15,7 +12,7 @@ body {
     display: flex;
     text-align: center;
     flex-direction: column;
-    flex-wrap: wrap;
+    color: #ffffff;
 }
 
 .button {
@@ -72,4 +69,61 @@ input[type="button"]:hover {
 .input-box:hover,
 .input-box:focus {
     border-color: #2980b9;
+}
+
+.top {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    top: 0;
+    left: 0;
+    background: linear-gradient(to right, rgb(6, 1, 50), #23617e ); /* 背景渐变色 */
+    height: 8%;
+
+}
+
+.top .user {
+    display: flex;
+    flex-direction: row;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 15%;
+    background: linear-gradient(to right,#23617e, rgb(6, 1, 50)); /* 背景渐变色 */
+}
+
+.top .user .avatar {
+    max-height: 100%;
+    margin-right: 5%;
+}
+
+.top .top_left {
+    margin-left: 1%;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+tr:hover {
+    background-color: #000000;
+}
+
+.result {
+    display: flex;
+    flex-direction: column;
 }

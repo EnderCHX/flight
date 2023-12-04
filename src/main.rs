@@ -205,7 +205,7 @@ async fn pay(cookies: &CookieJar<'_>, data: &str) -> &'static str {
 }
 
 #[get("/search?<leave>&<arrive>")]
-async fn search(leave: &str, arrive: &str) -> Template {
+async fn search(cookies: &CookieJar<'_>,leave: &str, arrive: &str) -> Template {
 
     let mut conn = POOL.get_conn().unwrap();
 
@@ -236,6 +236,14 @@ async fn search(leave: &str, arrive: &str) -> Template {
     }
 
     Template::render("search", context!{
+        name: {
+            let username = cookies.get_private("username").expect("获取cookie失败").to_string();
+            if username.len() > 8 {
+                username[9..].to_string()
+            } else {
+                "null".to_string()
+            }
+        },
         leave: leave,
         arrive: arrive,
         result: &result,
@@ -366,6 +374,7 @@ async fn admin(cookies: &CookieJar<'_>) -> Template {
                     "null".to_string()
                 }
             },
+            flight_num: flights_list.len(),
             flights: flights_list,
             users: users_list,
         })
@@ -554,6 +563,7 @@ async fn user_(cookies: &CookieJar<'_>) -> Template {
     }
 
     let mut pay_list: Vec<(i32, i32, i64)> = Vec::new();
+   
 
     for i in info {
         pay_list.push((i.1, i.2, i.3));

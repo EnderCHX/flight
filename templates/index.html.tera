@@ -10,7 +10,7 @@
     
     <div class = "top">
         <div class = "top_left">
-            <h1>机票售票系统</h1>
+            <h1 onclick="home()">机票售票系统</h1>
         </div>
 
         <div class = "user">

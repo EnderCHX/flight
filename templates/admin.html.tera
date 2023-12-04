@@ -9,7 +9,7 @@
 <body>
     <div class = "top">
         <div class = "top_left">
-            <h1>管理员后台</h1>
+            <h1 onclick="home()">机票售票系统</h1>
         </div>
         <div class = "user">
             <img class="avatar" src="/img/chxw.png" onclick="window.location.href = '/admin'">
@@ -20,63 +20,71 @@
     </div>
     <div class="container">
         <div class="left">
-            <button class="switch_button" onclick="document.querySelector('.user_info').style.visibility = 'hidden';document.querySelector('.flight_info').style.visibility = 'visible'">航班信息</button>
-            <button class="switch_button" onclick="document.querySelector('.user_info').style.visibility = 'visible';document.querySelector('.flight_info').style.visibility = 'hidden'">用户信息</button>
+            <button class="switch_button" onclick="document.querySelector('.p2').style.display = 'none';document.querySelector('.p1').style.display = 'block'">航班信息</button>
+            <button class="switch_button" onclick="document.querySelector('.p2').style.display = 'block';document.querySelector('.p1').style.display = 'none'">用户信息</button>
         </div>
 
+        <div class="p1">
         <div class="flight_info">
             <h1>航班信息及修改</h1>
             <div class="flight_word">
+                <p>共<label id="num">{{ flight_num }}</label>个航班</p>
                 <p>航班号|出发地|目的地|起飞机场|降落机场|起飞时间|降落时间|票价|票数|已订</p>
             </div>
             {% for flight in flights %}
             <div class="info_flight">
-                <p>
-                    <input type="text" placeholder="{{flight.0}}" value="{{flight.0}}" id="num_{{flight.0}}" class="flight_info" autocomplete="off">
-                    <input type="text" placeholder="{{flight.1}}" value="{{flight.1}}" id="leave_city_{{flight.0}}" class="flight_info" autocomplete="off">
-                    <input type="text" placeholder="{{flight.2}}" value="{{flight.2}}" id="arrive_city_{{flight.0}}" class="flight_info" autocomplete="off">
-                    <input type="text" placeholder="{{flight.3}}" value="{{flight.3}}" id="leave_airport_{{flight.0}}" class="flight_info" autocomplete="off">
-                    <input type="text" placeholder="{{flight.4}}" value="{{flight.4}}" id="arrive_airport_{{flight.0}}" class="flight_info" autocomplete="off">
-                    <input type="text" placeholder="{{flight.5}}" value="{{flight.5}}" id="leave_time_{{flight.0}}" class="flight_info" autocomplete="off">
-                    <input type="text" placeholder="{{flight.6}}" value="{{flight.6}}" id="arrive_time_{{flight.0}}" class="flight_info" autocomplete="off">
-                    <input type="text" placeholder="{{flight.7}}" value="{{flight.7}}" id="price_{{flight.0}}" class="flight_info" autocomplete="off">
-                    <input type="text" placeholder="{{flight.8}}" value="{{flight.8}}" id="capacity_{{flight.0}}" class="flight_info" autocomplete="off">
-                    <input type="text" placeholder="{{flight.9}}" value="{{flight.9}}" id="booked_{{flight.0}}" class="flight_info" autocomplete="off">
-               
-                    <input type="button" value="修改" onclick="change_flight({{flight.0}}, 1)">
-                    <input type="button" value="删除" onclick="change_flight({{flight.0}}, 2)">
-                </p>
+
+                <p>航班号<input class="input-box" type="text" placeholder="{{flight.0}}" value="{{flight.0}}" id="num_{{flight.0}}" class="flight_info" autocomplete="off"></p>
+                <p>出发地<input class="input-box" type="text" placeholder="{{flight.1}}" value="{{flight.1}}" id="leave_city_{{flight.0}}" class="flight_info" autocomplete="off"></p>
+                <p>目的地<input class="input-box" type="text" placeholder="{{flight.2}}" value="{{flight.2}}" id="arrive_city_{{flight.0}}" class="flight_info" autocomplete="off"></p>
+                <p>起飞机场<input class="input-box" type="text" placeholder="{{flight.3}}" value="{{flight.3}}" id="leave_airport_{{flight.0}}" class="flight_info" autocomplete="off"></p>
+                <p>降落机场<input class="input-box" type="text" placeholder="{{flight.4}}" value="{{flight.4}}" id="arrive_airport_{{flight.0}}" class="flight_info" autocomplete="off"></p>
+                <p>起飞时间<input class="input-box" type="datetime-local" placeholder="{{flight.5}}" value="{{flight.5}}" id="leave_time_{{flight.0}}" class="flight_info" autocomplete="off"></p>
+                <p>降落时间<input class="input-box" type="datetime-local" placeholder="{{flight.6}}" value="{{flight.6}}" id="arrive_time_{{flight.0}}" class="flight_info" autocomplete="off"></p>
+                <p>票价<input class="input-box" type="text" placeholder="{{flight.7}}" value="{{flight.7}}" id="price_{{flight.0}}" class="flight_info" autocomplete="off"></p>
+                <p>票数<input class="input-box" type="text" placeholder="{{flight.8}}" value="{{flight.8}}" id="capacity_{{flight.0}}" class="flight_info" autocomplete="off"></p>
+                <p>已订<input class="input-box" type="text" placeholder="{{flight.9}}" value="{{flight.9}}" id="booked_{{flight.0}}" class="flight_info" autocomplete="off"></p>
+
+                <p><input type="button" value="修改" onclick="change_flight({{flight.0}}, 1)">
+                <input type="button" value="删除" onclick="change_flight({{flight.0}}, 2)"></p>
+                
             </div>
             {% endfor %}
+            <h1>新增航班</h1>
+            <div class="flight_word">
+                <p>航班号|出发地|目的地|起飞机场|降落机场|起飞时间|降落时间|票价|票数|已订</p>
+            </div>
             <div class="change_info">
-                <h1>新增航班</h1>
-                <div class="flight_word">
-                    <p>航班号|出发地|目的地|起飞机场|降落机场|起飞时间|降落时间|票价|票数|已订</p>
-                </div>
-                <p>
-                    <input type="text" placeholder="航班号" id="num_0" autocomplete="off">
-                    <input type="text" placeholder="出发地" id="leave_city_0" autocomplete="off">
-                    <input type="text" placeholder="目的地" id="arrive_city_0" autocomplete="off">
-                    <input type="text" placeholder="起飞机场" id="leave_airport_0" autocomplete="off">
-                    <input type="text" placeholder="降落机场" id="arrive_airport_0" autocomplete="off">
-                    <input type="text" placeholder="起飞时间" id="leave_time_0" autocomplete="off">
-                    <input type="text" placeholder="降落时间" id="arrive_time_0" autocomplete="off">
-                    <input type="text" placeholder="票价" id="price_0" autocomplete="off">
-                    <input type="text" placeholder="票数" id="capacity_0" autocomplete="off">
-                    <input type="text" placeholder="已订" id="booked_0" autocomplete="off">
                 
-                    <input type="button" value="增加" onclick="change_flight(0, 0)">
-                </p>
+
+                    <p><input class="input-box" type="text" placeholder="航班号" id="num_0" autocomplete="off"></p>
+                    <p><input class="input-box" type="text" placeholder="出发地" id="leave_city_0" autocomplete="off"></p>
+                    <p><input class="input-box" type="text" placeholder="目的地" id="arrive_city_0" autocomplete="off"></p>
+                    <p><input class="input-box" type="text" placeholder="起飞机场" id="leave_airport_0" autocomplete="off"></p>
+                    <p><input class="input-box" type="text" placeholder="降落机场" id="arrive_airport_0" autocomplete="off"></p>
+                    <p><input class="input-box" type="datetime-local" placeholder="起飞时间" id="leave_time_0" autocomplete="off"></p>
+                    <p><input class="input-box" type="datetime-local" placeholder="降落时间" id="arrive_time_0" autocomplete="off"></p>
+                    <p><input class="input-box" type="text" placeholder="票价" id="price_0" autocomplete="off"></p>
+                    <p><input class="input-box" type="text" placeholder="票数" id="capacity_0" autocomplete="off"></p>
+                    <p><input class="input-box" type="text" placeholder="已订" id="booked_0" autocomplete="off"></p>
+                
+                    <p><input type="button" value="增加" onclick="change_flight(0, 0)"></p>
+                
             </div>
         </div>
+        </div>
 
+        <div class="p2"><h1>用户信息修改</h1>
         <div class="user_info">
+            
                 {% for user in users %}
+                <div class="info_user">
                 <p>
                     <input type="text" placeholder="{{user.0}}" value="{{user.0}}" id="uid_{{user.0}}" class="user_info" readonly autocomplete="off">
                     <input type="text" placeholder="{{user.1}}" value="{{user.1}}" id="username_{{user.0}}" class="user_info" autocomplete="off">
                     <input type="password" placeholder="{{user.2}}" value="{{user.2}}" id="password_{{user.0}}" class="user_info" autocomplete="off">
                     
+
                     <label class="switch">
                         {% if user.3 %}
                         <input type="checkbox" value="{{user.3}}" id="admin_{{user.0}}" class="user_info" checked="true" autocomplete="off">
@@ -85,11 +93,18 @@
                         {% endif %}
                         <span class="slider"></span>
                     </label>
-                </p>
-                <p>
+                
                     <input type="button" value="修改" onclick="change_user({{user.0}})">
                 </p>
+            </div>
             {% endfor %}
+            
         </div>
+        </div>
+        <script>
+            for(i = 1; i <= getE("num").innerHTML ; i++) {
+                get_time(i);
+            }
+        </script>
     </div>
 </body>

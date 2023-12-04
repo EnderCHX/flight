@@ -3,9 +3,6 @@ body, html {
     margin: 0;
 }
 
-h1 {
-    mix-blend-mode: difference;
-}
 
 
 body {
@@ -19,38 +16,7 @@ body {
     flex-wrap: wrap;
 }
 
-.top {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
 
-    top: 0;
-    left: 0;
-    background-image: url("/img/background2.png");
-    height: 8%;
-
-}
-
-.top .user {
-    display: flex;
-    flex-direction: row;
-    top: 0;
-    right: 0;
-    height: 100%;
-    width: 15%;
-    background-image: url("/img/background3.png");
-    /* mix-blend-mode: difference; */
-}
-
-.top .user .avatar {
-    max-height: 100%;
-    margin-right: 5%;
-}
-
-.top .top_left {
-    margin-left: 1%;
-}
 
 .main {
     margin-top: 10%;
@@ -61,5 +27,4 @@ body {
     font-size: 18px;
     font-weight: bold;
     color: #ffffff;
-    mix-blend-mode: difference;
 }

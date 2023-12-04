@@ -141,8 +141,8 @@ function change_flight(e, type) {
         "arrive_city":      getE(`arrive_city_${e}`).value,
         "leave_airport":    getE(`leave_airport_${e}`).value,
         "arrive_airport":   getE(`arrive_airport_${e}`).value,
-        "leave_time":       getE(`leave_time_${e}`).value,
-        "arrive_time":      getE(`arrive_time_${e}`).value,
+        "leave_time":       (new Date(getE(`leave_time_${e}`).value).getTime()),
+        "arrive_time":      (new Date(getE(`arrive_time_${e}`).value).getTime()),
         "price":            getE(`price_${e}`).value,
         "capacity":         getE(`capacity_${e}`).value,
         "booked":           getE(`booked_${e}`).value,
@@ -230,7 +230,7 @@ function pay() {
         uid: getE("uid").innerHTML,
         num: getE("num").innerHTML,
         amount: getE("amount").value,
-        time: getE("time").innerHTML,
+        time: new Date().getTime(),
     };
 
     fetch("/pay", {
@@ -310,4 +310,26 @@ user_change = () => {
     }).catch((error) => {
         console.log(error)
     })
+}
+
+get_time = (e) => {
+    let leave_time = getE(`leave_time_${e}`);
+    let arrive_time = getE(`arrive_time_${e}`);
+    let formatter = new Intl.DateTimeFormat('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        timeZone: 'Asia/Shanghai'
+    });
+
+    let date = formatter.format(parseInt(leave_time.placeholder, 10)).replace(" ", "T").replace(/\//g, "-").slice(0, 16)
+    console.log(date)
+    leave_time.value = date
+
+    let date2 = formatter.format(parseInt(arrive_time.placeholder, 10)).replace(" ", "T").replace(/\//g, "-").slice(0, 16)
+    console.log(date2)
+    arrive_time.value = date2
 }
