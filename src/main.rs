@@ -5,7 +5,7 @@ use mysql::prelude::*;
 use mysql::*;
 use payment::Payment;
 use rocket::http::CookieJar;
-use rocket::fs::{FileServer, relative};
+use rocket::fs::FileServer;
 use rocket::response::Redirect;
 use rocket_dyn_templates::*;
 use rand::Rng;
@@ -721,7 +721,7 @@ fn rocket() -> _ {
                                   user_do,
                                   change_flight,
                                   change_user])
-        .mount("/", FileServer::from(relative!("static")))
+        .mount("/", FileServer::from("./static"))
         .attach(Template::fairing())
         .attach(cors::get_cors())
 }
